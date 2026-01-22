@@ -1,0 +1,4010 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>高中航空知識互動溫習網頁</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft JhengHei", "Noto Sans TC", sans-serif;
+        }
+        body {
+            background-color: #f5f7fa;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 30px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #4299e1;
+            padding-bottom: 15px;
+        }
+        .header h1 {
+            color: #2d3748;
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+        .header p {
+            color: #718096;
+            font-size: 16px;
+        }
+        .progress {
+            margin-bottom: 20px;
+            color: #4a5568;
+            font-size: 15px;
+            text-align: right;
+        }
+        .question-area {
+            margin-bottom: 25px;
+        }
+        .question-number {
+            background-color: #4299e1;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+        .question-text {
+            font-size: 18px;
+            color: #2d3748;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+        .option {
+            background-color: #f8f9fa;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            padding: 12px 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 16px;
+            color: #2d3748;
+        }
+        .option:hover {
+            border-color: #4299e1;
+            background-color: #e8f4f8;
+        }
+        .option.selected {
+            border-color: #4299e1;
+            background-color: #e8f4f8;
+        }
+        .option.correct {
+            border-color: #48bb78;
+            background-color: #f0f8fb;
+        }
+        .option.incorrect {
+            border-color: #e53e3e;
+            background-color: #fef7fb;
+        }
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        .btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .btn-submit {
+            background-color: #4299e1;
+            color: white;
+        }
+        .btn-submit:hover {
+            background-color: #3182ce;
+        }
+        .btn-nav {
+            background-color: #f8f9fa;
+            color: #2d3748;
+        }
+        .btn-nav:hover {
+            background-color: #e2e8f0;
+        }
+        .feedback-area {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        .feedback-correct {
+            background-color: #eaf6fa;
+            border-left: 4px solid #48bb78;
+        }
+        .feedback-incorrect {
+            background-color: #fef7fb;
+            border-left: 4px solid #e53e3e;
+        }
+        .feedback-title {
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+        .feedback-correct .feedback-title {
+            color: #22543d;
+        }
+        .feedback-incorrect .feedback-title {
+            color: #742a2a;
+        }
+        .feedback-content {
+            color: #4a5568;
+            font-size: 15px;
+            line-height: 1.5;
+        }
+        .explanation {
+            background-color: #fafafa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+            border: 1px solid #dee2e6;
+        }
+        .explanation-title {
+            font-weight: bold;
+            color: #2d3748;
+            margin-bottom: 5px;
+            font-size: 15px;
+        }
+        .explanation-text {
+            color: #718096;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #718096;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>高中航空知識互動溫習題庫</h1>
+            <p>基於FAA飛行員航空知識手冊 | 即時反饋解析</p>
+        </div>
+
+        <div class="progress">
+            第 <span id="current-question">1</span> 題 
+        </div>
+
+        <div class="question-area">
+            <div class="question-number">題目 <span id="question-id">1</span></div>
+            <div class="question-text" id="question-content">載入中...</div>
+        </div>
+
+        <div class="options">
+            <div class="option" data-option="A" onclick="selectOption(this)">A. 載入中...</div>
+            <div class="option" data-option="B" onclick="selectOption(this)">B. 載入中...</div>
+            <div class="option" data-option="C" onclick="selectOption(this)">C. 載入中...</div>
+            <div class="option" data-option="D" onclick="selectOption(this)">D. 載入中...</div>
+        </div>
+
+        <div class="btn-group">
+            <button class="btn btn-nav" onclick="prevQuestion()" disabled>上一題</button>
+            <button class="btn btn-submit" onclick="submitAnswer()">提交答案</button>
+            <button class="btn btn-nav" onclick="nextQuestion()">下一題</button>
+        </div>
+<!-- 原有：题数显示区域 -->
+<div class="question-count">
+  當前題：<span id="current-question">1</span>/<span id="total-questions">300</span>
+</div>
+
+<!-- 👇 新增：跳转到特定题号/随机题号功能（直接粘贴这部分） -->
+<div style="margin: 15px 0; text-align: center;">
+  <label for="target-question">跳轉到題號：</label>
+  <input type="number" id="target-question" min="1" max="300" style="width: 60px; padding: 5px; margin: 0 10px;" placeholder="1-300">
+  <button onclick="jumpToSpecificQuestion()" style="padding: 5px 15px; cursor: pointer; background: #4CAF50; color: white; border: none; border-radius: 3px;">確認跳轉</button>
+  <button onclick="jumpToRandomQuestion()" style="padding: 5px 15px; cursor: pointer; background: #2196F3; color: white; border: none; border-radius: 3px; margin-left: 10px;">隨機跳轉</button>
+</div>
+<!-- 👆 新增结束 -->
+
+<!-- 原有：导航按钮区域 -->
+
+        <div class="footer">
+            設計用於高中航空知識問答比賽溫習 | 答案依據FAA《飛行員航空知識手冊》2003版中譯本
+        </div>
+    </div>
+
+    <script>
+        // 航空知識题库（繁體中文整理）
+        const questionBank = [
+            // 模組一：飛機結構基礎
+            {
+                id: 1,
+                question: "飛機產生升力的最核心部件是？",
+                options: {
+                    A: "機身",
+                    B: "機翼",
+                    C: "尾翼",
+                    D: "發動機"
+                },
+                answer: "B",
+                explanation: "手冊第一章-飛機結構（P20）：機翼是連接到機身兩邊的翅膀，也是支持飛機飛行的主要升力表面。"
+            },
+            {
+                id: 2,
+                question: "用於支撐飛機停放、滑行和起降的部件是？",
+                options: {
+                    A: "襟翼",
+                    B: "起落架",
+                    C: "方向舵",
+                    D: "擾流板"
+                },
+                answer: "B",
+                explanation: "手冊第一章-飛機結構（P23）：起落架是飛機停放、滑行、起飛或者著陸時的主要支撐部分。"
+            },
+            {
+                id: 3,
+                question: "飛機機身的主要作用不包括以下哪項？",
+                options: {
+                    A: "承載乘客和貨物",
+                    B: "安裝控制裝置",
+                    C: "產生升力",
+                    D: "掛載其他部件"
+                },
+                answer: "C",
+                explanation: "手冊第一章-飛機結構（P18）：機身主要承載載荷、安裝控制裝置和掛載部件，升力由機翼產生。"
+            },
+            {
+                id: 4,
+                question: "飛機尾翼中，控制飛機俯仰運動的部件是？",
+                options: {
+                    A: "方向舵",
+                    B: "升降舵",
+                    C: "垂直尾翼",
+                    D: "配平片"
+                },
+                answer: "B",
+                explanation: "手冊第一章-飛機結構（P21）：升降舵安裝在水平尾翼後面，用於控制飛行中飛機頭部向上或向下運動。"
+            },
+            {
+                id: 5,
+                question: "以下哪種發動機類型是小型飛機最常用的？",
+                options: {
+                    A: "渦輪噴氣發動機",
+                    B: "往復式發動機",
+                    C: "渦輪螺旋槳發動機",
+                    D: "渦輪軸發動機"
+                },
+                answer: "B",
+                explanation: "手冊第五章-飛機系統（P106）：大多數小飛機設計有往復式發動機，通過活塞的前後往復運動產生機械能量。"
+            },
+            // 模組二：飛行基本原理
+            {
+                id: 6,
+                question: "機翼產生升力的核心物理原理是？",
+                options: {
+                    A: "牛頓第三定律",
+                    B: "伯努利原理",
+                    C: "萬有引力定律",
+                    D: "電磁感應定律"
+                },
+                answer: "B",
+                explanation: "手冊第二章-飛行原理（P28）：伯努利原理指出運動流體速度增加會導致壓力降低，機翼上表面氣流速度快、壓力低，與下表面形成壓力差產生升力。"
+            },
+            {
+                id: 7,
+                question: "飛行中，與飛機前進方向相反的「阻力」主要分為兩類，不包括以下哪種？",
+                options: {
+                    A: "寄生阻力",
+                    B: "誘導阻力",
+                    C: "重力阻力",
+                    D: "摩擦阻力"
+                },
+                answer: "C",
+                explanation: "手冊第三章-飛行空氣動力學（P37）：阻力分為寄生阻力和誘導阻力，寄生阻力包含摩擦阻力；重力是向下的力，不屬於阻力。"
+            },
+            {
+                id: 8,
+                question: "以下哪種因素會導致空氣密度降低？",
+                options: {
+                    A: "壓力升高",
+                    B: "溫度升高",
+                    C: "濕度降低",
+                    D: "高度降低"
+                },
+                answer: "B",
+                explanation: "手冊第二章-飛行原理（P26）：溫度升高會降低空氣密度，壓力升高、濕度降低、高度降低都會使空氣密度增加。"
+            },
+            {
+                id: 9,
+                question: "牛頓第三定律在飛行中的應用是？",
+                options: {
+                    A: "飛機靜止時保持靜止",
+                    B: "發動機推力與空氣反作用力推動飛機前進",
+                    C: "迎角過大導致失速",
+                    D: "空氣密度影響升力"
+                },
+                answer: "B",
+                explanation: "手冊第二章-飛行原理（P26）：螺旋槳向後推動空氣，空氣產生相反方向的反作用力，推動飛機前進，符合牛頓第三定律。"
+            },
+            {
+                id: 10,
+                question: "翼尖渦流產生的主要原因是？",
+                options: {
+                    A: "機翼上下表面壓力差",
+                    B: "空氣摩擦",
+                    C: "發動機推力不均",
+                    D: "迎角過小"
+                },
+                answer: "A",
+                explanation: "手冊第三章-飛行空氣動力學（P42）：機翼下表面壓力大於上表面，空氣從下向上繞翼尖流動，形成翼尖渦流。"
+            },
+            {
+                id: 11,
+                question: "地面效應會使飛機的誘導阻力如何變化？",
+                options: {
+                    A: "增加",
+                    B: "降低",
+                    C: "不變",
+                    D: "先增後減"
+                },
+                answer: "B",
+                explanation: "手冊第三章-飛行空氣動力學（P43）：地面效應限制了機翼周圍氣流的垂直分量，減少翼尖渦流，從而降低誘導阻力。"
+            },
+            {
+                id: 12,
+                question: "飛機失速的直接原因是？",
+                options: {
+                    A: "速度過快",
+                    B: "迎角過大",
+                    C: "燃油不足",
+                    D: "高度過高"
+                },
+                answer: "B",
+                explanation: "手冊第三章-飛行空氣動力學（P60）：每次失速的直接原因是迎角過大，氣流從機翼上表面分離，升力驟降。"
+            },
+            {
+                id: 13,
+                question: "以下哪種力不是作用於飛機的基本力？",
+                options: {
+                    A: "推力",
+                    B: "浮力",
+                    C: "重力",
+                    D: "升力"
+                },
+                answer: "B",
+                explanation: "手冊第三章-飛行空氣動力學（P34）：作用於飛機的基本力包括推力、阻力、重力和升力，浮力不屬此類。"
+            },
+            {
+                id: 14,
+                question: "馬格努斯效應與以下哪種現象相關？",
+                options: {
+                    A: "機翼升力產生",
+                    B: "螺旋槳推力產生",
+                    C: "翼尖渦流形成",
+                    D: "地面效應"
+                },
+                answer: "A",
+                explanation: "手冊第二章-飛行原理（P27）：馬格努斯效應解釋了旋轉物體（如機翼）產生壓力差進而產生升力的原因。"
+            },
+            // 模組三：飛行控制常識
+            {
+                id: 15,
+                question: "控制飛機繞縱軸「側滾」運動的部件是？",
+                options: {
+                    A: "副翼",
+                    B: "升降舵",
+                    C: "方向舵",
+                    D: "襟翼"
+                },
+                answer: "A",
+                explanation: "手冊第四章-飛行控制（P91）：副翼安裝在機翼後緣外側，運動方向相反，控制飛機繞縱軸的側滾。"
+            },
+            {
+                id: 16,
+                question: "飛機起飛和著陸時，伸出襟翼的主要目的是？",
+                options: {
+                    A: "增加升力",
+                    B: "提高速度",
+                    C: "減少重量",
+                    D: "降低噪音"
+                },
+                answer: "A",
+                explanation: "手冊第四章-飛行控制（P100）：襟翼伸出時向下延伸，增加機翼的升力，幫助飛機在低速時順利起降。"
+            },
+            {
+                id: 17,
+                question: "以下哪種裝置可以減輕副翼產生的「逆偏轉」現象？",
+                options: {
+                    A: "配平片",
+                    B: "差動副翼",
+                    C: "擾流板",
+                    D: "前緣裝置"
+                },
+                answer: "B",
+                explanation: "手冊第四章-飛行控制（P92）：差動副翼設計使一側副翼上升距離大於另一側下降距離，平衡阻力，減輕逆偏轉。"
+            },
+            {
+                id: 18,
+                question: "全動式水平尾翼（Stabilator）的作用與以下哪種部件類似？",
+                options: {
+                    A: "升降舵",
+                    B: "方向舵",
+                    C: "副翼",
+                    D: "襟翼"
+                },
+                answer: "A",
+                explanation: "手冊第四章-飛行控制（P97）：全動式水平尾翼繞水平鉸鏈軸轉動，功能與升降舵一致，控制飛機俯仰。"
+            },
+            {
+                id: 19,
+                question: "方向舵的主要作用是控制飛機的？",
+                options: {
+                    A: "俯仰",
+                    B: "側滾",
+                    C: "偏航",
+                    D: "升力"
+                },
+                answer: "C",
+                explanation: "手冊第四章-飛行控制（P98）：方向舵控制飛機沿垂直軸的運動，即飛機頭部左右偏轉的偏航運動。"
+            },
+            {
+                id: 20,
+                question: "輔助飛行控制中的「擾流板」不具備以下哪種功能？",
+                options: {
+                    A: "降低升力",
+                    B: "增加阻力",
+                    C: "控制側滾",
+                    D: "產生升力"
+                },
+                answer: "D",
+                explanation: "手冊第四章-飛行控制（P101）：擾流板通過擾亂氣流降低升力、增加阻力，部分可輔助控制側滾，不能產生升力。"
+            },
+            {
+                id: 21,
+                question: "配平片的主要作用是？",
+                options: {
+                    A: "增加升力",
+                    B: "減輕飛行員控制壓力",
+                    C: "提高速度",
+                    D: "減少阻力"
+                },
+                answer: "B",
+                explanation: "手冊第四章-飛行控制（P102）：配平片從駕駛艙控制，降低控制面的操作壓力，幫助維持控制面位置。"
+            },
+            // 模組四：飛機系統入門
+            {
+                id: 22,
+                question: "飛機燃油系統中，用於過濾燃油雜質的部件是？",
+                options: {
+                    A: "油箱",
+                    B: "燃油表",
+                    C: "燃油篩檢器",
+                    D: "燃油選擇器"
+                },
+                answer: "C",
+                explanation: "手冊第五章-飛機系統（P126）：燃油篩檢器用於清除燃油中的灰塵和沉積物，保護發動機。"
+            },
+            {
+                id: 23,
+                question: "往復式發動機的四衝程循環不包括以下哪一步？",
+                options: {
+                    A: "進氣衝程",
+                    B: "壓縮衝程",
+                    C: "冷卻衝程",
+                    D: "排氣衝程"
+                },
+                answer: "C",
+                explanation: "手冊第五章-飛機系統（P107）：往復式發動機的四衝程為進氣、壓縮、燃燒、排氣，無冷卻衝程。"
+            },
+            {
+                id: 24,
+                question: "以下哪種燃油不能用於往復式發動機？",
+                options: {
+                    A: "航空汽油（AVGAS）",
+                    B: "汽車汽油",
+                    C: "100LL航空汽油",
+                    D: "航空煤油（JET A）"
+                },
+                answer: "D",
+                explanation: "手冊第五章-飛機系統（P126）：往復式發動機使用航空汽油，渦輪發動機使用航空煤油。"
+            },
+            {
+                id: 25,
+                question: "飛機潤滑系統的主要功能不包括？",
+                options: {
+                    A: "潤滑活動部件",
+                    B: "冷卻發動機",
+                    C: "產生推力",
+                    D: "帶走污染物"
+                },
+                answer: "C",
+                explanation: "手冊第五章-飛機系統（P130）：潤滑系統負責潤滑、冷卻、密封和帶走污染物，推力由發動機產生。"
+            },
+            {
+                id: 26,
+                question: "汽化器結冰的主要原因是？",
+                options: {
+                    A: "燃油蒸發和氣壓降低",
+                    B: "外部溫度過低",
+                    C: "濕度不足",
+                    D: "燃油品質不佳"
+                },
+                answer: "A",
+                explanation: "手冊第五章-飛機系統（P114）：汽化器中文氏管氣壓降低和燃油蒸發導致溫度下降，使空氣中水蒸氣結冰。"
+            },
+            {
+                id: 27,
+                question: "飛機除冰系統中，用於機翼除冰的常見裝置是？",
+                options: {
+                    A: "可膨脹除冰罩",
+                    B: "酒精噴射",
+                    C: "電加熱絲",
+                    D: "化學塗層"
+                },
+                answer: "A",
+                explanation: "手冊第五章-飛機系統（P146）：可膨脹除冰罩通過充氣膨脹破碎機翼前緣的冰層，是常用的機翼除冰裝置。"
+            },
+            {
+                id: 28,
+                question: "渦輪發動機的核心部件不包括以下哪項？",
+                options: {
+                    A: "壓縮機",
+                    B: "燃燒室",
+                    C: "活塞",
+                    D: "渦輪"
+                },
+                answer: "C",
+                explanation: "手冊第五章-飛機系統（P150）：渦輪發動機核心部件為壓縮機、燃燒室、渦輪和排氣節，活塞是往復式發動機的部件。"
+            },
+            {
+                id: 29,
+                question: "飛機電源系統中，為啟動發動機提供電力的是？",
+                options: {
+                    A: "交流發電機",
+                    B: "電池",
+                    C: "調壓器",
+                    D: "匯流條"
+                },
+                answer: "B",
+                explanation: "手冊第五章-飛機系統（P134）：電池存儲電能，為發動機啟動和應急供電提供電力，交流發電機負責飛行中供電。"
+            },
+            {
+                id: 30,
+                question: "飛機液壓系統的作用是？",
+                options: {
+                    A: "提供燃油",
+                    B: "傳遞動力控制部件",
+                    C: "冷卻發動機",
+                    D: "淨化空氣"
+                },
+                answer: "B",
+                explanation: "手冊第五章-飛機系統（P137）：液壓系統通過液體壓力傳遞動力，控制起落架、刹車、螺旋槳等部件。"
+            },
+            // 模組五：飛行儀錶基礎
+            {
+                id: 31,
+                question: "能夠直接顯示飛機飛行高度的儀錶是？",
+                options: {
+                    A: "空速表",
+                    B: "高度計",
+                    C: "姿態指示儀",
+                    D: "垂直速度表"
+                },
+                answer: "B",
+                explanation: "手冊第六章-飛行儀錶（P158）：高度計測量飛機高於給定壓力平面的高度，是唯一顯示高度資訊的儀錶。"
+            },
+            {
+                id: 32,
+                question: "顯示飛機爬升或下降速率的儀錶是？",
+                options: {
+                    A: "磁羅盤",
+                    B: "航向指示儀",
+                    C: "垂直速度表",
+                    D: "空速表"
+                },
+                answer: "C",
+                explanation: "手冊第六章-飛行儀錶（P162）：垂直速度指示儀（VSI）顯示飛機爬升、下降或水平飛行，速率以每分鐘英尺為單位。"
+            },
+            {
+                id: 33,
+                question: "空速表測量的是哪種空速？",
+                options: {
+                    A: "真實空速",
+                    B: "指示空速",
+                    C: "地面速度",
+                    D: "校準空速"
+                },
+                answer: "B",
+                explanation: "手冊第六章-飛行儀錶（P164）：空速表直接顯示指示空速，未校正大氣密度、安裝誤差等因素。"
+            },
+            {
+                id: 34,
+                question: "陀螺飛行儀錶的核心特性不包括？",
+                options: {
+                    A: "空間剛性",
+                    B: "進動",
+                    C: "磁性",
+                    D: "高速旋轉"
+                },
+                answer: "C",
+                explanation: "手冊第六章-飛行儀錶（P170）：陀螺儀錶依賴空間剛性和進動特性，通過高速旋轉工作，不依賴磁性。"
+            },
+            {
+                id: 35,
+                question: "姿態指示儀中，代表真實地平線的是？",
+                options: {
+                    A: "縮微小飛機",
+                    B: "地平線線條",
+                    C: "傾斜刻度",
+                    D: "俯仰刻度"
+                },
+                answer: "B",
+                explanation: "手冊第六章-飛行儀錶（P176）：姿態指示儀中的地平線線條固定在陀螺上，保持水平，代表真實地平線。"
+            },
+            {
+                id: 36,
+                question: "磁羅盤的主要誤差不包括以下哪種？",
+                options: {
+                    A: "磁偏角",
+                    B: "磁傾角",
+                    C: "進動誤差",
+                    D: "羅盤偏差"
+                },
+                answer: "C",
+                explanation: "手冊第六章-飛行儀錶（P180-181）：磁羅盤誤差包括磁偏角、羅盤偏差和磁傾角，進動誤差是陀螺儀錶的誤差。"
+            },
+            {
+                id: 37,
+                question: "當皮託管堵塞但排水孔通暢時，空速表會顯示？",
+                options: {
+                    A: "實際空速",
+                    B: "零",
+                    C: "偏高",
+                    D: "偏低"
+                },
+                answer: "B",
+                explanation: "手冊第六章-飛行儀錶（P167）：皮託管堵塞後，系統內空氣通過排水孔排出，空速表檢測不到壓力差，顯示為零。"
+            },
+            {
+                id: 38,
+                question: "航向指示儀需要定期與哪種儀錶校準？",
+                options: {
+                    A: "高度計",
+                    B: "磁羅盤",
+                    C: "空速表",
+                    D: "垂直速度表"
+                },
+                answer: "B",
+                explanation: "手冊第六章-飛行儀錶（P178）：航向指示儀會因進動產生漂移，需定期與磁羅盤對齊校準。"
+            },
+            {
+                id: 39,
+                question: "以下哪種儀錶不屬於皮托-靜壓系統儀錶？",
+                options: {
+                    A: "高度計",
+                    B: "空速表",
+                    C: "姿態指示儀",
+                    D: "垂直速度表"
+                },
+                answer: "C",
+                explanation: "手冊第六章-飛行儀錶（P157）：皮托-靜壓系統儀錶包括高度計、空速表和垂直速度表，姿態指示儀是陀螺儀錶。"
+            },
+            {
+                id: 40,
+                question: "外部空氣溫度表的主要作用是？",
+                options: {
+                    A: "顯示駕駛艙溫度",
+                    B: "輔助計算真實空速",
+                    C: "控制空調系統",
+                    D: "檢測結冰風險"
+                },
+                answer: "B",
+                explanation: "手冊第六章-飛行儀錶（P183）：外部空氣溫度表提供外界空氣溫度，用於計算真實空速和判斷結冰條件。"
+            },
+            // 模組六：空域與導航常識
+            {
+                id: 41,
+                question: "以下哪種空域屬於「非管制空域」？",
+                options: {
+                    A: "A類空域",
+                    B: "G類空域",
+                    C: "B類空域",
+                    D: "C類空域"
+                },
+                answer: "B",
+                explanation: "手冊第十三章-空域（P343）：非管制空域僅包括G類空域，A、B、C、D、E類均為受控空域。"
+            },
+            {
+                id: 42,
+                question: "飛機導航中，最基礎的指向儀錶是？",
+                options: {
+                    A: "高度計",
+                    B: "磁羅盤",
+                    C: "姿態指示儀",
+                    D: "空速表"
+                },
+                answer: "B",
+                explanation: "手冊第六章-飛行儀錶（P179）：磁羅盤是所有飛機必需設備，用於設定航向指示儀，故障時作為備用定向工具。"
+            },
+            {
+                id: 43,
+                question: "磁偏角是指什麼之間的夾角？",
+                options: {
+                    A: "磁北極與真北極",
+                    B: "磁北極與飛機航向",
+                    C: "真北極與飛機航向",
+                    D: "磁羅盤與航向指示儀"
+                },
+                answer: "A",
+                explanation: "手冊第六章-飛行儀錶（P180）：磁偏角是磁羅盤參照的磁北極和真北極之間的角誤差。"
+            },
+            {
+                id: 44,
+                question: "以下哪種導航方式依賴地面地標？",
+                options: {
+                    A: "地標領航",
+                    B: "航位推測法",
+                    C: "VOR導航",
+                    D: "GPS導航"
+                },
+                answer: "A",
+                explanation: "手冊第十四章-導航（P363）：地標領航通過識別地面明顯地標確定位置和航向。"
+            },
+            {
+                id: 45,
+                question: "受控空域中，需要飛行員與空管建立通信的是？",
+                options: {
+                    A: "G類空域",
+                    B: "E類空域",
+                    C: "D類空域",
+                    D: "警戒區域"
+                },
+                answer: "C",
+                explanation: "手冊第十三章-空域（P342）：D類空域為受控空域，飛行員需與空管建立通信並獲得許可。"
+            },
+            {
+                id: 46,
+                question: "世界航圖中，用於確定地理位置的坐標是？",
+                options: {
+                    A: "經度和緯度",
+                    B: "高度和距離",
+                    C: "航向和速度",
+                    D: "磁偏角和偏差"
+                },
+                answer: "A",
+                explanation: "手冊第十四章-導航（P349）：航圖通過經度和緯度坐標確定地球表面的具體位置。"
+            },
+            {
+                id: 47,
+                question: "VOR導航屬於以下哪種導航類型？",
+                options: {
+                    A: "無線電導航",
+                    B: "地標導航",
+                    C: "慣性導航",
+                    D: "衛星導航"
+                },
+                answer: "A",
+                explanation: "手冊第十四章-導航（P374）：VOR（甚高頻全向信標）是無線電導航的一種，通過接收地面信號確定航向。"
+            },
+            {
+                id: 48,
+                question: "飛行計畫中，計算地面速度的公式是？",
+                options: {
+                    A: "地面速度=距離÷時間",
+                    B: "地面速度=時間÷距離",
+                    C: "地面速度=距離×時間",
+                    D: "地面速度=速度+風速"
+                },
+                answer: "A",
+                explanation: "手冊第十四章-導航（P360）：地面速度（GS）是飛機相對於地面的實際速度，計算公式為GS=D/T（距離÷時間）。"
+            },
+            {
+                id: 49,
+                question: "以下哪種空域禁止普通飛機進入？",
+                options: {
+                    A: "限制區域",
+                    B: "禁止區域",
+                    C: "警告區域",
+                    D: "警戒區域"
+                },
+                answer: "B",
+                explanation: "手冊第十三章-空域（P343）：禁止區域明確禁止普通飛機進入，限制區域需獲得許可，警告和警戒區域僅提示風險。"
+            },
+            {
+                id: 50,
+                question: "磁羅盤在北半球加速時，指針會向哪個方向偏轉？",
+                options: {
+                    A: "北",
+                    B: "南",
+                    C: "東",
+                    D: "西"
+                },
+                answer: "A",
+                explanation: "手冊第六章-飛行儀錶（P181）：北半球磁羅盤存在加速誤差，加速時指針向北偏轉，減速時向南偏轉。"
+            },
+// 第51-100題题库（接續之前的questionBank數組）
+{
+    id: 51,
+    question: "飛機機身的「單體橫造」設計特點是？",
+    options: {
+        A: "依賴桁架結構支撐",
+        B: "由加強外殼承載幾乎全部載荷",
+        C: "需要外部支杆輔助",
+        D: "重量大但剛性差"
+    },
+    answer: "B",
+    explanation: "手冊第一章-飛機結構（P18）：單體橫造設計使用加強的外殼來支援幾乎全部的載荷，結構堅固但表面不能有凹痕或變形。"
+},
+{
+    id: 52,
+    question: "以下哪種屬於雙翼機的特徵？",
+    options: {
+        A: "僅有一組機翼",
+        B: "兩組上下排列的機翼",
+        C: "機翼安裝在機身中部",
+        D: "無需外部支杆"
+    },
+    answer: "B",
+    explanation: "手冊第一章-飛機結構（P19）：有兩組機翼的飛機稱為雙翼機或者複翼飛機，單翼機僅有一組機翼。"
+},
+{
+    id: 53,
+    question: "機翼的「翼肋」主要作用是？",
+    options: {
+        A: "傳遞推力",
+        B: "確定機翼的外形和厚度",
+        C: "控制側滾運動",
+        D: "存儲燃油"
+    },
+    answer: "B",
+    explanation: "手冊第一章-飛機結構（P20）：翼肋決定了機翼的外形和厚度，是機翼的主要結構部件之一。"
+},
+{
+    id: 54,
+    question: "飛機尾翼中「垂直尾翼」的核心功能是？",
+    options: {
+        A: "控制俯仰",
+        B: "提供方向穩定性",
+        C: "增加升力",
+        D: "減少阻力"
+    },
+    answer: "B",
+    explanation: "手冊第一章-飛機結構（P21）：垂直尾翼屬於尾翼的固定翼面，主要作用是提供飛機的方向穩定性。"
+},
+{
+    id: 55,
+    question: "「半懸臂機翼」的特點是？",
+    options: {
+        A: "完全依賴外殼強度，無外部支杆",
+        B: "需要外部支杆傳遞載荷",
+        C: "僅用於低翼設計",
+        D: "機翼厚度極薄"
+    },
+    answer: "B",
+    explanation: "手冊第一章-飛機結構（P19）：半懸臂機翼通過外部支杆把飛行和著陸負荷傳遞到主機身結構，支杆通常安裝在機翼突出機身的一半位置。"
+},
+// 模組二：飛行基本原理（56-65題）
+{
+    id: 56,
+    question: "空氣密度與大氣壓力的關係是？",
+    options: {
+        A: "壓力升高，密度降低",
+        B: "壓力升高，密度升高",
+        C: "壓力與密度無關",
+        D: "壓力降低，密度升高"
+    },
+    answer: "B",
+    explanation: "手冊第二章-飛行原理（P26）：密度直接與壓力成正比，在恒定溫度條件下，壓力增倍，密度也增倍；壓力降低，密度相應降低。"
+},
+{
+    id: 57,
+    question: "「伯努利原理」在文氏管中的表現是？",
+    options: {
+        A: "喉部氣流速度降低，壓力升高",
+        B: "喉部氣流速度升高，壓力降低",
+        C: "入口與喉部壓力相同",
+        D: "出口氣流速度最低"
+    },
+    answer: "B",
+    explanation: "手冊第二章-飛行原理（P28）：文氏管喉部直徑最小，氣流速度增加，壓力降低；出口處氣流速度降低，壓力恢復。"
+},
+{
+    id: 58,
+    question: "飛機在「超載」狀態下，失速速度會如何變化？",
+    options: {
+        A: "不變",
+        B: "升高",
+        C: "降低",
+        D: "先升高後降低"
+    },
+    answer: "B",
+    explanation: "手冊第三章-飛行空氣動力學（P72）：失速速度隨載荷因數的平方根成比例增加，超載時載荷因數增大，失速速度升高。"
+},
+{
+    id: 59,
+    question: "「誘導阻力」與空速的關係是？",
+    options: {
+        A: "與空速平方成正比",
+        B: "與空速平方成反比",
+        C: "與空速成正比",
+        D: "與空速無關"
+    },
+    answer: "B",
+    explanation: "手冊第三章-飛行空氣動力學（P39）：總誘導阻力和空速的平方成反比變化，空速越低，誘導阻力越大。"
+},
+{
+    id: 60,
+    question: "「寄生阻力」中不包括以下哪種？",
+    options: {
+        A: "形阻力",
+        B: "摩擦阻力",
+        C: "干擾阻力",
+        D: "渦流阻力"
+    },
+    answer: "D",
+    explanation: "手冊第三章-飛行空氣動力學（P37）：寄生阻力包括形阻力、外殼摩擦阻力和干擾阻力，渦流阻力屬於誘導阻力。"
+},
+{
+    id: 61,
+    question: "牛頓第一定律在飛行中的應用是？",
+    options: {
+        A: "飛機靜止時保持靜止，運動時保持原有速度和方向",
+        B: "螺旋槳推力與空氣反作用力平衡",
+        C: "機翼升力與重力平衡",
+        D: "空氣流動速度與壓力成反比"
+    },
+    answer: "A",
+    explanation: "手冊第二章-飛行原理（P25）：牛頓第一定律指出，靜止物體保持靜止，運動物體保持原有速度和方向，直到有外界力量改變它。"
+},
+{
+    id: 62,
+    question: "「升阻比（L/D）最大」時的意義是？",
+    options: {
+        A: "飛機速度最快",
+        B: "總阻力最小，燃油效率最高",
+        C: "升力最大，適合起降",
+        D: "機動性最強"
+    },
+    answer: "B",
+    explanation: "手冊第三章-飛行空氣動力學（P40）：最大升阻比（L/D Max）出現在特定迎角，此時總阻力最小，克服阻力所需動力最小，燃油效率最高。"
+},
+{
+    id: 63,
+    question: "濕空氣比干空氣密度低的原因是？",
+    options: {
+        A: "水蒸氣分子質量比空氣分子小",
+        B: "水蒸氣壓力高",
+        C: "濕空氣溫度更高",
+        D: "水蒸氣易於壓縮"
+    },
+    answer: "A",
+    explanation: "手冊第二章-飛行原理（P26）：水蒸氣比空氣輕，因此濕空氣比干空氣密度小，在給定條件下，空氣中水汽含量越多，密度越小。"
+},
+{
+    id: 64,
+    question: "「壓力中心」隨機翼迎角的變化是？",
+    options: {
+        A: "迎角增加，壓力中心向後移",
+        B: "迎角增加，壓力中心向前移",
+        C: "迎角減小，壓力中心向前移",
+        D: "迎角與壓力中心無關"
+    },
+    answer: "B",
+    explanation: "手冊第三章-飛行空氣動力學（P49）：迎角增加時，壓力中心趨於向前移動；迎角減小時，壓力中心趨於向後移動。"
+},
+{
+    id: 65,
+    question: "「地面效應」的影響範圍主要在機翼高度為多少時最明顯？",
+    options: {
+        A: "等於翼展",
+        B: "1/4翼展以內",
+        C: "2倍翼展",
+        D: "與翼展無關"
+    },
+    answer: "B",
+    explanation: "手冊第三章-飛行空氣動力學（P43）：機翼高度為四分之一翼展時，誘導阻力降低23.5%；高度等於翼尖十分之一時，誘導阻力降低47.6%，僅有機翼非常靠近地面時，地面效應才明顯。"
+},
+// 模組三：飛行控制常識（66-75題）
+{
+    id: 66,
+    question: "「弗裡茲型副翼」的優點是？",
+    options: {
+        A: "完全消除逆偏轉",
+        B: "通過偏置鉸鏈增加阻力，減輕逆偏轉",
+        C: "僅用於高速飛機",
+        D: "結構最簡單"
+    },
+    answer: "B",
+    explanation: "手冊第四章-飛行控制（P93）：弗裡茲型副翼在偏置鉸鏈上旋轉，升起時前緣突出到氣流中產生阻力，均衡另一側副翼的阻力，減輕逆偏轉。"
+},
+{
+    id: 67,
+    question: "「配平片」安裝在控制面的哪個位置？",
+    options: {
+        A: "前緣",
+        B: "後緣",
+        C: "中部",
+        D: "根部"
+    },
+    answer: "B",
+    explanation: "手冊第四章-飛行控制（P102）：配平片是位於控制面尾部邊緣的可活動小部分，從駕駛艙控制，降低控制壓力。"
+},
+{
+    id: 68,
+    question: "「T型尾翼」的設計主要是為了？",
+    options: {
+        A: "增加升力",
+        B: "遠離機翼渦流，提高控制有效性",
+        C: "簡化結構，降低重量",
+        D: "提高飛行速度"
+    },
+    answer: "B",
+    explanation: "手冊第四章-飛行控制（P95）：T型尾翼將水準尾翼安裝在垂直尾翼頂部，遠離機翼產生的湍流和發動機排出的氣流，提高低速和失速狀態下的控制有效性。"
+},
+{
+    id: 69,
+    question: "「前緣縫翼」的主要作用是？",
+    options: {
+        A: "提高巡航速度",
+        B: "延遲氣流分離，增加最大升力",
+        C: "減少著陸距離",
+        D: "降低誘導阻力"
+    },
+    answer: "B",
+    explanation: "手冊第四章-飛行控制（P101）：前緣縫翼打開時，機翼下方的空氣流過機翼上表面，延遲大迎角時的氣流分離，增加最大升力係數。"
+},
+{
+    id: 70,
+    question: "「擾流板」作為速度制動器時，會如何影響飛機？",
+    options: {
+        A: "增加升力，降低速度",
+        B: "降低升力，增加阻力",
+        C: "僅增加阻力，不影響升力",
+        D: "僅降低升力，不影響阻力"
+    },
+    answer: "B",
+    explanation: "手冊第四章-飛行控制（P101）：擾流板打開時擾亂機翼上表面氣流，降低升力並增加阻力，起到減速作用，同時幫助著陸時轉移重量到輪子上。"
+},
+{
+    id: 71,
+    question: "「耦合副翼和方向舵」的設計目的是？",
+    options: {
+        A: "簡化操縱桿設計",
+        B: "自動協調轉彎，克服逆偏轉",
+        C: "提高高速飛行穩定性",
+        D: "降低製造成本"
+    },
+    answer: "B",
+    explanation: "手冊第四章-飛行控制（P93）：耦合副翼和方向舵通過互連彈簧，使副翼偏轉時自動帶動方向舵偏轉，幫助糾正副翼產生的逆偏轉，實現協調轉彎。"
+},
+{
+    id: 72,
+    question: "「全動式水準尾翼」的控制方式與以下哪項類似？",
+    options: {
+        A: "副翼",
+        B: "方向舵",
+        C: "升降舵",
+        D: "襟翼"
+    },
+    answer: "C",
+    explanation: "手冊第四章-飛行控制（P97）：全動式水準尾翼繞中心鉸鏈點轉動，功能與升降舵一致，通過控制輪操縱，用於控制飛機俯仰運動。"
+},
+{
+    id: 73,
+    question: "「開縫襟翼」相比簡單襟翼的優勢是？",
+    options: {
+        A: "阻力更小",
+        B: "升力增加更多，氣流分離延遲",
+        C: "結構更簡單",
+        D: "適用速度範圍更廣"
+    },
+    answer: "B",
+    explanation: "手冊第四章-飛行控制（P100）：開縫襟翼通過導氣槽將下表面高能量空氣輸送到上表面，加速邊界層流，延遲氣流分離，比簡單襟翼產生更大的升力係數。"
+},
+{
+    id: 74,
+    question: "飛機轉彎時，「方向舵」的主要作用是？",
+    options: {
+        A: "產生轉彎向心力",
+        B: "克服逆偏轉，保持協調轉彎",
+        C: "增加轉彎速度",
+        D: "降低轉彎半徑"
+    },
+    answer: "B",
+    explanation: "手冊第四章-飛行控制（P91）：轉彎時副翼產生側滾，同時會產生逆偏轉，方向舵用於克服這種逆偏轉，使飛機保持協調轉彎，避免側滑。"
+},
+{
+    id: 75,
+    question: "「地面可調式配平片」的調整時機是？",
+    options: {
+        A: "飛行中根據空速調整",
+        B: "地面停機時調整，用於修正常見偏航",
+        C: "起飛後根據航向調整",
+        D: "著陸前調整，提高穩定性"
+    },
+    answer: "B",
+    explanation: "手冊第四章-飛行控制（P104）：地面可調式配平片通常安裝在方向舵上，在地面時彎曲調整，用於糾正飛機飛行時的固定偏航趨勢，無需飛行中調整。"
+},
+// 模組四：飛機系統入門（76-85題）
+{
+    id: 76,
+    question: "往復式發動機的「點火系統」通常包含幾個磁電機？",
+    options: {
+        A: "1個",
+        B: "2個",
+        C: "3個",
+        D: "4個"
+    },
+    answer: "B",
+    explanation: "手冊第五章-飛機系統（P121）：大多數標準認證的飛機安裝一對點火系統，包含兩個獨立的磁電機、分開的電纜和兩組火花塞，增加可靠性。"
+},
+{
+    id: 77,
+    question: "「汽化器加熱」系統的主要作用是？",
+    options: {
+        A: "提高燃油蒸發效率",
+        B: "防止汽化器結冰",
+        C: "增加發動機功率",
+        D: "降低排氣溫度"
+    },
+    answer: "B",
+    explanation: "手冊第五章-飛機系統（P115）：汽化器加熱在空氣到達汽化器前預先加熱，保持油氣混合氣溫度高於冰點，避免汽化器結冰，也可融化輕度積冰。"
+},
+{
+    id: 78,
+    question: "飛機燃油系統中「燃油選擇器」的「BOTH」位置含義是？",
+    options: {
+        A: "關閉燃油供應",
+        B: "僅使用左側油箱",
+        C: "同時使用左右兩側油箱",
+        D: "僅使用右側油箱"
+    },
+    answer: "C",
+    explanation: "手冊第五章-飛機系統（P125）：燃油選擇器的「BOTH」位置表示同時使用左右兩個油箱的燃油，常用於正常巡航飛行，避免單一油箱耗盡。"
+},
+{
+    id: 79,
+    question: "「渦輪增壓器」的動力來源是？",
+    options: {
+        A: "發動機曲軸",
+        B: "發動機廢氣",
+        C: "電動馬達",
+        D: "螺旋槳傳動"
+    },
+    answer: "B",
+    explanation: "手冊第五章-飛機系統（P119）：渦輪增壓器的動力來源於發動機的廢氣，通過廢氣驅動渦輪，再帶動壓縮機壓縮進氣，無需消耗發動機輸出功率。"
+},
+{
+    id: 80,
+    question: "飛機「潤滑油溫度錶」的綠色區域表示？",
+    options: {
+        A: "最小允許溫度",
+        B: "正常運行溫度範圍",
+        C: "最大允許溫度",
+        D: "起動時溫度範圍"
+    },
+    answer: "B",
+    explanation: "手冊第五章-飛機系統（P131）：潤滑油溫度錶的綠色區域表示正常運行溫度範圍，紅色線表示最大允許溫度，高溫可能意味著潤滑系統故障或發動機過熱。"
+},
+{
+    id: 81,
+    question: "「燃油篩檢器」的主要作用是？",
+    options: {
+        A: "測量燃油量",
+        B: "過濾燃油中的雜質和水分",
+        C: "控制燃油流量",
+        D: "冷卻燃油"
+    },
+    answer: "B",
+    explanation: "手冊第五章-飛機系統（P126）：燃油篩檢器安裝在燃油選擇器之後，用於清除燃油中的灰塵、沉積物和水分，保護發動機免受損害。"
+},
+{
+    id: 82,
+    question: "「氣冷式發動機」的冷卻方式是？",
+    options: {
+        A: "通過冷卻液迴圈冷卻",
+        B: "通過機翼散熱片和氣流冷卻",
+        C: "通過燃油冷卻",
+        D: "通過潤滑油冷卻"
+    },
+    answer: "B",
+    explanation: "手冊第五章-飛機系統（P132）：氣冷式發動機通過空氣從引擎罩前方開口流入，經過氣缸外的散熱片，吸收熱量後從引擎罩後方排出，實現冷卻。"
+},
+{
+    id: 83,
+    question: "「備用空氣源」的作用是？",
+    options: {
+        A: "增加發動機功率",
+        B: "當主空氣篩檢器堵塞時提供空氣",
+        C: "冷卻駕駛艙",
+        D: "為燃油系統加壓"
+    },
+    answer: "B",
+    explanation: "手冊第五章-飛機系統（P112）：進氣系統的備用空氣源通常位於引擎罩內部，當主空氣篩檢器被灰塵或冰堵塞時，自動或手動切換使用，確保發動機獲得足夠空氣。"
+},
+{
+    id: 84,
+    question: "「電力燃油泵」的主要用途不包括？",
+    options: {
+        A: "發動機啟動時供應燃油",
+        B: "主燃油泵失效時備用",
+        C: "增加燃油壓力，提高功率",
+        D: "冷天氣協助燃油蒸發"
+    },
+    answer: "C",
+    explanation: "手冊第五章-飛機系統（P123）：電力燃油泵（輔助燃油泵）用於發動機啟動、主燃油泵失效時備用，部分可用於冷天氣協助燃油蒸發，但不能增加燃油壓力以提高功率。"
+},
+{
+    id: 85,
+    question: "「除冰罩」的運行原理是？",
+    options: {
+        A: "電加熱融化積冰",
+        B: "通過充氣膨脹破碎積冰",
+        C: "噴射酒精防止結冰",
+        D: "改變機翼外形避免結冰"
+    },
+    answer: "B",
+    explanation: "手冊第五章-飛機系統（P146）：可膨脹除冰罩由橡膠薄板組成，搭接到機翼前緣，積冰時通過氣動泵使橡膠罩膨脹，破碎冰層並使其脫落。"
+},
+// 模組五：飛行儀錶基礎（86-95題）
+{
+    id: 86,
+    question: "「高度計」的「Kollsman窗」用於調整什麼？",
+    options: {
+        A: "高度單位",
+        B: "海平面氣壓設定",
+        C: "高度計靈敏度",
+        D: "溫度補償"
+    },
+    answer: "B",
+    explanation: "手冊第六章-飛行儀錶（P160）：高度計的Kollsman窗（大氣壓力設定窗）用於調整海平面氣壓設定，補償非標準大氣壓力，確保高度指示準確。"
+},
+{
+    id: 87,
+    question: "「垂直速度指示儀（VSI）」的延遲現象是指？",
+    options: {
+        A: "高度變化後，儀錶需要時間才能顯示正確速率",
+        B: "儀錶反應過快，出現誤差",
+        C: "僅在高速時出現指示延遲",
+        D: "僅在爬升時出現指示延遲"
+    },
+    answer: "A",
+    explanation: "手冊第六章-飛行儀錶（P163）：VSI的隔膜外部通過受限制的孔連接靜壓管，當飛機爬升或下降時，隔膜內部壓力立即變化，外部壓力需時間調整，導致儀錶需要短時間才能顯示正確的爬升/下降速率，即延遲現象。"
+},
+{
+    id: 88,
+    question: "「空速表」的紅線（Vne）表示？",
+    options: {
+        A: "最小失速速度",
+        B: "最大結構巡航速度",
+        C: "永不超過的速度",
+        D: "襟翼最大使用速度"
+    },
+    answer: "C",
+    explanation: "手冊第六章-飛行儀錶（P166）：空速表的紅線標記為Vne（永不超過的速度），禁止在這個速度以上運行，否則可能導致結構損壞或失效。"
+},
+{
+    id: 89,
+    question: "「姿態指示儀」的「縮微小飛機」調整旋鈕用於？",
+    options: {
+        A: "校準高度",
+        B: "調整小飛機相對於地平線的位置，適應飛行員視線",
+        C: "修正磁偏角",
+        D: "調整靈敏度"
+    },
+    answer: "B",
+    explanation: "手冊第六章-飛行儀錶（P176）：姿態指示儀的調整旋鈕用於調節縮微小飛機相對於地平線的上下位置，以配合飛行員的視線角度，使平直飛行時機翼與地平線對齊。"
+},
+{
+    id: 90,
+    question: "「航向指示儀」的「進動誤差」是指？",
+    options: {
+        A: "儀錶隨時間慢慢偏離正確航向",
+        B: "僅在轉彎時出現的誤差",
+        C: "與磁羅盤的偏差",
+        D: "高速時出現的誤差"
+    },
+    answer: "A",
+    explanation: "手冊第六章-飛行儀錶（P178）：航向指示儀由於陀螺儀的摩擦力產生進動，會隨時間慢慢偏離正確航向，需要定期與磁羅盤校準，通常每15分鐘一次。"
+},
+{
+    id: 91,
+    question: "「磁羅盤」的「羅盤偏差」是由什麼引起的？",
+    options: {
+        A: "磁北極與真北極的差異",
+        B: "飛機自身金屬或電子設備的磁場",
+        C: "地球磁場的垂直分量",
+        D: "飛機速度變化"
+    },
+    answer: "B",
+    explanation: "手冊第六章-飛行儀錶（P180）：羅盤偏差是飛機內部金屬或電子附件產生的磁場扭曲地球磁場導致的誤差，製造商通過安裝補償磁體降低偏差。"
+},
+{
+    id: 92,
+    question: "「皮托-靜壓系統」堵塞時，哪個儀錶不受影響？",
+    options: {
+        A: "高度計",
+        B: "空速表",
+        C: "垂直速度表",
+        D: "磁羅盤"
+    },
+    answer: "D",
+    explanation: "手冊第六章-飛行儀錶（P157）：皮托-靜壓系統為高度計、空速表和垂直速度表提供壓力源，堵塞會影響這三個儀錶；磁羅盤基於磁力原理工作，與皮托-靜壓系統無關，不受影響。"
+},
+{
+    id: 93,
+    question: "「外部空氣溫度錶（OAT）」不用於以下哪項？",
+    options: {
+        A: "計算真實空速",
+        B: "判斷結冰條件",
+        C: "調整燃油混合比",
+        D: "顯示駕駛艙溫度"
+    },
+    answer: "D",
+    explanation: "手冊第六章-飛行儀錶（P183）：外部空氣溫度錶提供外界空氣溫度，用於計算真實空速、判斷結冰條件，部分可用於輔助調整燃油混合比，但不顯示駕駛艙內部溫度。"
+},
+{
+    id: 94,
+    question: "「轉彎協調儀」的「傾角計」小球居中表示？",
+    options: {
+        A: "飛機處於水準飛行",
+        B: "轉彎協調，無側滑",
+        C: "飛機速度穩定",
+        D: "航向無偏差"
+    },
+    answer: "B",
+    explanation: "手冊第六章-飛行儀錶（P175）：轉彎協調儀的傾角計小球居中表示飛機轉彎時副翼和方向舵協調，無內滑或外滑，是協調轉彎的標誌。"
+},
+{
+    id: 95,
+    question: "「高度計」在冷天氣下的指示誤差是？",
+    options: {
+        A: "指示高度高於實際高度",
+        B: "指示高度低於實際高度",
+        C: "僅在低空出現誤差",
+        D: "無誤差"
+    },
+    answer: "A",
+    explanation: "手冊第六章-飛行儀錶（P159）：冷天氣下空氣密度比標準條件高，相同壓力對應的實際高度更低，因此高度計會指示高於實際的高度，遵循「從熱到冷，向外朝下看」的原則。"
+},
+// 模組六：空域與導航常識（96-100題）
+{
+    id: 96,
+    question: "「A類空域」的主要運行規則是？",
+    options: {
+        A: "僅允許VFR（目視飛行規則）飛行",
+        B: "僅允許IFR（儀表飛行規則）飛行",
+        C: "無需與空管通信",
+        D: "僅開放給輕型飛機"
+    },
+    answer: "B",
+    explanation: "手冊第十三章-空域（P342）：A類空域屬於受控空域，僅允許IFR飛行，飛行員必須與空管建立通信並獲得許可。"
+},
+{
+    id: 97,
+    question: "「地標領航」的核心是通過什麼確定位置？",
+    options: {
+        A: "無線電信號",
+        B: "地面明顯標誌（如山峰、建築）",
+        C: "衛星定位",
+        D: "陀螺儀錶"
+    },
+    answer: "B",
+    explanation: "手冊第十四章-導航（P363）：地標領航是通過識別地面明顯標誌（如河流、橋梁、山峰等），結合航圖確定飛機位置和航向的導航方式。"
+},
+{
+    id: 98,
+    question: "「禁止區域」的空域使用規則是？",
+    options: {
+        A: "需提前申請許可方可進入",
+        B: "禁止普通飛機進入",
+        C: "僅白天開放",
+        D: "僅輕型飛機可進入"
+    },
+    answer: "B",
+    explanation: "手冊第十三章-空域（P343）：禁止區域是專用空域的一種，明確禁止普通飛機進入，通常用於軍事訓練或安全敏感區域。"
+},
+{
+    id: 99,
+    question: "「航位推測法」導航不需要以下哪項數據？",
+    options: {
+        A: "起點位置",
+        B: "飛行速度",
+        C: "風向風速",
+        D: "地面地標"
+    },
+    answer: "D",
+    explanation: "手冊第十四章-導航（P363）：航位推測法通過起點位置、飛行速度、航向和風向風速數據，計算飛機當前位置，無需依賴地面地標。"
+},
+{
+    id: 100,
+    question: "「GPS導航」屬於以下哪種類型？",
+    options: {
+        A: "地標導航",
+        B: "無線電導航",
+        C: "衛星導航",
+        D: "慣性導航"
+    },
+    answer: "C",
+    explanation: "手冊第十四章-導航（P386）：全球定位系統（GPS）通過接收衛星信號確定飛機位置，屬於衛星導航類型，具有精度高、覆蓋廣的優點。"
+},
+
+// 第101-150題题库（接續之前的questionBank數組）
+{
+    id: 101,
+    question: "飛機「濕沉積潤滑系統」的特點是？",
+    options: {
+        A: "潤滑油儲存於發動機外部獨立油箱",
+        B: "潤滑油流過發動機後返回沉積器",
+        C: "僅適用於大型渦輪發動機",
+        D: "不需要油泵提供壓力"
+    },
+    answer: "B",
+    explanation: "手冊第五章-飛機系統（P131）：濕沉積系統的油泵從沉積器抽油並導流到發動機，潤滑油流過發動機之後，返回到沉積器。"
+},
+{
+    id: 102,
+    question: "氣冷式發動機的冷卻原理是？",
+    options: {
+        A: "通過冷卻液迴圈帶走熱量",
+        B: "利用機翼散熱片和氣流交換熱量",
+        C: "依靠燃油蒸發降溫",
+        D: "通過電加熱器散熱"
+    },
+    answer: "B",
+    explanation: "手冊第五章-飛機系統（P132）：氣冷通過空氣從引擎罩前方開口流入，導流片引導空氣穿過氣缸外的散熱片，吸收熱量後從引擎罩後方排出。"
+},
+{
+    id: 103,
+    question: "飛機電力系統中，「交流發電機」相比「發電機」的優勢是？",
+    options: {
+        A: "低轉速時也能產生足夠電流",
+        B: "僅能輸出交流電，無法轉換",
+        C: "重量更大，穩定性更差",
+        D: "電力輸出受轉速影響極大"
+    },
+    answer: "A",
+    explanation: "手冊第五章-飛機系統（P134）：交流發電機即使在較低發動機轉速時，也能產生足夠電流運作整個電力系統，且輸出更恒定。"
+},
+{
+    id: 104,
+    question: "液壓系統中「泄壓閥」的主要作用是？",
+    options: {
+        A: "增加液壓油壓力",
+        B: "防止系統壓力過大",
+        C: "儲存液壓油",
+        D: "控制液流方向"
+    },
+    answer: "B",
+    explanation: "手冊第五章-飛機系統（P137）：泄壓閥門為系統在液壓過大時提供出口，避免壓力超過設計極限。"
+},
+{
+    id: 105,
+    question: "「前三點式起落架」相比「後三點式」的優點不包括？",
+    options: {
+        A: "著陸時制動更有力，不易抬頭",
+        B: "地面滑行方向穩定性更好",
+        C: "起飛著陸時前向視野更佳",
+        D: "適用於無堅實地面的場地"
+    },
+    answer: "D",
+    explanation: "手冊第五章-飛機系統（P138）：後三點式起落架更適合在沒有堅實地面的場地運作，前三點式的優勢包括制動效果、視野和方向穩定性。"
+},
+// 模組二：飛行基本原理（106-115題）
+{
+    id: 106,
+    question: "「地面效應」對飛機的主要影響是？",
+    options: {
+        A: "增加誘導阻力",
+        B: "降低誘導阻力，提升升力效率",
+        C: "僅影響高速飛行",
+        D: "使機翼升力完全消失"
+    },
+    answer: "B",
+    explanation: "手冊第三章-飛行空氣動力學（P43）：地面效應限制機翼周圍氣流垂直分量，減少翼尖渦流，從而降低誘導阻力，提升升力效率。"
+},
+{
+    id: 107,
+    question: "飛機「失速」時，氣流的主要變化是？",
+    options: {
+        A: "機翼上表面氣流分離",
+        B: "機翼下表面氣流速度過快",
+        C: "推力突然消失",
+        D: "阻力完全抵消升力"
+    },
+    answer: "A",
+    explanation: "手冊第三章-飛行空氣動力學（P60）：失速的直接原因是迎角過大，導致機翼上表面氣流分離，升力驟降。"
+},
+{
+    id: 108,
+    question: "「升阻比（L/D）最大」時，飛機的狀態是？",
+    options: {
+        A: "速度最快",
+        B: "總阻力最小，燃油效率最高",
+        C: "升力最大，適合起降",
+        D: "機動性最強"
+    },
+    answer: "B",
+    explanation: "手冊第三章-飛行空氣動力學（P40）：最大升阻比（L/D Max）出現在特定迎角，此時總阻力最小，克服阻力所需動力最小，燃油效率最高。"
+},
+{
+    id: 109,
+    question: "「寄生阻力」中，「干擾阻力」的產生原因是？",
+    options: {
+        A: "機翼上下表面壓力差",
+        B: "兩個物體靠近放置，氣流紊亂加劇",
+        C: "機身表面粗糙導致氣流摩擦",
+        D: "翼尖渦流引起的氣流干擾"
+    },
+    answer: "B",
+    explanation: "手冊第三章-飛行空氣動力學（P37）：干擾阻力是兩個物體靠近放置時，產生的合成紊亂比單個測試時大50%到200%，屬於寄生阻力的一種。"
+},
+{
+    id: 110,
+    question: "空氣密度降低時，飛機為維持相同升力，需要？",
+    options: {
+        A: "降低空速或增加迎角",
+        B: "提高空速或增加迎角",
+        C: "降低空速或減小迎角",
+        D: "提高空速或減小迎角"
+    },
+    answer: "B",
+    explanation: "手冊第二章-飛行原理（P26）：升力與空氣密度直接相關，密度降低時，需通過提高空速或增加迎角來彌補，以維持升力等於重力。"
+},
+{
+    id: 111,
+    question: "「牛頓第三定律」在飛行中體現為？",
+    options: {
+        A: "飛機靜止時保持靜止",
+        B: "螺旋槳向後推動空氣，空氣產生反作用力推動飛機",
+        C: "迎角過大導致失速",
+        D: "空氣速度與壓力成反比"
+    },
+    answer: "B",
+    explanation: "手冊第二章-飛行原理（P26）：螺旋槳向後推動空氣，空氣產生相反方向的反作用力，推動飛機前進，符合牛頓第三定律（作用力與反作用力）。"
+},
+{
+    id: 112,
+    question: "「翼尖渦流」的強度與以下哪項成正比？",
+    options: {
+        A: "飛機重量",
+        B: "飛機速度",
+        C: "翼展長度",
+        D: "寄生阻力"
+    },
+    answer: "A",
+    explanation: "手冊第三章-飛行空氣動力學（P42）：翼尖渦流的強度直接與飛機的重量成正比，與翼展及飛機速度成反比，重量越大，渦流越強。"
+},
+{
+    id: 113,
+    question: "「壓力中心」隨迎角的變化規律是？",
+    options: {
+        A: "迎角增加，壓力中心向後移",
+        B: "迎角增加，壓力中心向前移",
+        C: "迎角減小，壓力中心向前移",
+        D: "迎角與壓力中心無關"
+    },
+    answer: "B",
+    explanation: "手冊第三章-飛行空氣動力學（P49）：迎角增加時，壓力中心趨於向前移動；迎角減小時，壓力中心趨於向後移動。"
+},
+{
+    id: 114,
+    question: "「誘導阻力」與空速的關係是？",
+    options: {
+        A: "與空速平方成正比",
+        B: "與空速平方成反比",
+        C: "與空速成正比",
+        D: "與空速無關"
+    },
+    answer: "B",
+    explanation: "手冊第三章-飛行空氣動力學（P39）：總誘導阻力和空速的平方成反比變化，空速越低，誘導阻力越大。"
+},
+{
+    id: 115,
+    question: "濕空氣比干空氣密度低的主要原因是？",
+    options: {
+        A: "水蒸氣分子質量比空氣分子小",
+        B: "濕空氣溫度必然更高",
+        C: "水蒸氣壓力比空氣高",
+        D: "水蒸氣易於壓縮"
+    },
+    answer: "A",
+    explanation: "手冊第二章-飛行原理（P26）：水蒸氣比空氣輕（分子質量更小），因此濕空氣比干空氣密度小，空氣中水汽含量越多，密度越小。"
+},
+// 模組三：飛行控制常識（116-125題）
+{
+    id: 116,
+    question: "「全動式水平尾翼（Stabilator）」的主要功能是？",
+    options: {
+        A: "控制側滾",
+        B: "控制俯仰",
+        C: "控制偏航",
+        D: "增加寄生阻力"
+    },
+    answer: "B",
+    explanation: "手冊第四章-飛行控制（P97）：全動式水平尾翼繞水平鉸鏈軸轉動，功能與升降舵一致，用於控制飛機俯仰運動。"
+},
+{
+    id: 117,
+    question: "「前緣縫翼」打開時的主要作用是？",
+    options: {
+        A: "提高巡航速度",
+        B: "延遲氣流分離，增加最大升力",
+        C: "減少著陸距離",
+        D: "降低誘導阻力"
+    },
+    answer: "B",
+    explanation: "手冊第四章-飛行控制（P101）：前緣縫翼打開時，機翼下方的空氣流過機翼上表面，加速邊界層流，延遲大迎角時的氣流分離，增加最大升力係數。"
+},
+{
+    id: 118,
+    question: "「擾流板」作為速度制動器時，會同時產生什麼效果？",
+    options: {
+        A: "增加升力，降低速度",
+        B: "降低升力，增加阻力",
+        C: "僅增加阻力，不影響升力",
+        D: "僅降低升力，不影響阻力"
+    },
+    answer: "B",
+    explanation: "手冊第四章-飛行控制（P101）：擾流板打開時擾亂機翼上表面氣流，同時降低升力並增加阻力，起到減速作用。"
+},
+{
+    id: 119,
+    question: "「弗裡茲型副翼」的設計目的是？",
+    options: {
+        A: "完全消除逆偏轉",
+        B: "通過偏置鉸鏈增加阻力，減輕逆偏轉",
+        C: "僅用於高速飛機",
+        D: "簡化結構，降低重量"
+    },
+    answer: "B",
+    explanation: "手冊第四章-飛行控制（P93）：弗裡茲型副翼在偏置鉸鏈上旋轉，升起時前緣突出到氣流中產生阻力，均衡另一側副翼的阻力，減輕逆偏轉。"
+},
+{
+    id: 120,
+    question: "「T型尾翼」的設計優勢是？",
+    options: {
+        A: "增加升力，提高巡航速度",
+        B: "遠離機翼渦流，提升低速控制有效性",
+        C: "簡化結構，降低製造成本",
+        D: "減少寄生阻力"
+    },
+    answer: "B",
+    explanation: "手冊第四章-飛行控制（P95）：T型尾翼將水準尾翼安裝在垂直尾翼頂部，遠離機翼產生的湍流，提高低速和失速狀態下的控制有效性。"
+},
+{
+    id: 121,
+    question: "「開縫襟翼」相比「簡單襟翼」的優勢是？",
+    options: {
+        A: "阻力更小，適合高速飛行",
+        B: "升力增加更多，氣流分離延遲",
+        C: "結構更簡單，維護成本低",
+        D: "適用速度範圍更廣"
+    },
+    answer: "B",
+    explanation: "手冊第四章-飛行控制（P100）：開縫襟翼通過導氣槽將下表面高能量空氣輸送到上表面，延遲氣流分離，比簡單襟翼產生更大的升力係數。"
+},
+{
+    id: 122,
+    question: "飛機轉彎時，「方向舵」的核心作用是？",
+    options: {
+        A: "產生轉彎向心力",
+        B: "克服逆偏轉，保持協調轉彎",
+        C: "增加轉彎速度",
+        D: "減小轉彎半徑"
+    },
+    answer: "B",
+    explanation: "手冊第四章-飛行控制（P91）：轉彎時副翼產生側滾，同時會產生逆偏轉，方向舵用於克服這種逆偏轉，使飛機保持協調轉彎，避免側滑。"
+},
+{
+    id: 123,
+    question: "「地面可調式配平片」的調整時機是？",
+    options: {
+        A: "飛行中根據空速實時調整",
+        B: "地面停機時調整，修正固定偏航趨勢",
+        C: "起飛後根據航向調整",
+        D: "著陸前調整，提升穩定性"
+    },
+    answer: "B",
+    explanation: "手冊第四章-飛行控制（P104）：地面可調式配平片通常安裝在方向舵上，在地面時調整，用於糾正飛機飛行時的固定偏航趨勢，無需飛行中調整。"
+},
+{
+    id: 124,
+    question: "「耦合副翼和方向舵」的設計目的是？",
+    options: {
+        A: "簡化操縱桿結構",
+        B: "自動協調轉彎，克服逆偏轉",
+        C: "提高高速飛行穩定性",
+        D: "降低製造成本"
+    },
+    answer: "B",
+    explanation: "手冊第四章-飛行控制（P93）：耦合副翼和方向舵通過互連彈簧，使副翼偏轉時自動帶動方向舵偏轉，幫助糾正副翼產生的逆偏轉，實現協調轉彎。"
+},
+{
+    id: 125,
+    question: "「配平片」的主要作用是？",
+    options: {
+        A: "增加升力，提升飛行速度",
+        B: "減輕飛行員的控制壓力",
+        C: "減少寄生阻力",
+        D: "控制飛機偏航運動"
+    },
+    answer: "B",
+    explanation: "手冊第四章-飛行控制（P102）：配平片是位於控制面尾部邊緣的可活動小部分，從駕駛艙控制，降低控制面的操作壓力，幫助維持控制面位置。"
+},
+// 模組四：飛機系統入門（126-135題）
+{
+    id: 126,
+    question: "往復式發動機的「點火系統」通常包含幾個磁電機？",
+    options: {
+        A: "1個",
+        B: "2個",
+        C: "3個",
+        D: "4個"
+    },
+    answer: "B",
+    explanation: "手冊第五章-飛機系統（P121）：大多數標準認證的飛機安裝一對點火系統，包含兩個獨立的磁電機、分開的電纜和兩組火花塞，增加可靠性。"
+},
+{
+    id: 127,
+    question: "「汽化器加熱」系統的核心作用是？",
+    options: {
+        A: "提高燃油蒸發效率，增加功率",
+        B: "防止汽化器結冰",
+        C: "降低排氣溫度",
+        D: "冷卻進氣，穩定油氣混合比"
+    },
+    answer: "B",
+    explanation: "手冊第五章-飛機系統（P115）：汽化器加熱在空氣到達汽化器前預先加熱，保持油氣混合氣溫度高於冰點，避免汽化器結冰，也可融化輕度積冰。"
+},
+{
+    id: 128,
+    question: "燃油系統中「燃油選擇器」的「BOTH」位置含義是？",
+    options: {
+        A: "關閉燃油供應",
+        B: "僅使用左側油箱",
+        C: "同時使用左右兩側油箱",
+        D: "僅使用右側油箱"
+    },
+    answer: "C",
+    explanation: "手冊第五章-飛機系統（P125）：燃油選擇器的「BOTH」位置表示同時使用左右兩個油箱的燃油，常用於正常巡航飛行，避免單一油箱耗盡。"
+},
+{
+    id: 129,
+    question: "「渦輪增壓器」的動力來源是？",
+    options: {
+        A: "發動機曲軸傳動",
+        B: "發動機廢氣",
+        C: "電動馬達",
+        D: "螺旋槳傳動"
+    },
+    answer: "B",
+    explanation: "手冊第五章-飛機系統（P119）：渦輪增壓器的動力來源於發動機的廢氣，通過廢氣驅動渦輪，再帶動壓縮機壓縮進氣，無需消耗發動機輸出功率。"
+},
+{
+    id: 130,
+    question: "「可膨脹除冰罩」的運行原理是？",
+    options: {
+        A: "電加熱融化積冰",
+        B: "充氣膨脹破碎積冰",
+        C: "噴射酒精防止結冰",
+        D: "改變機翼外形避免結冰"
+    },
+    answer: "B",
+    explanation: "手冊第五章-飛機系統（P146）：可膨脹除冰罩由橡膠薄板組成，搭接到機翼前緣，積冰時通過氣動泵使橡膠罩膨脹，破碎冰層並使其脫落。"
+},
+{
+    id: 131,
+    question: "「渦輪螺旋槳發動機」的核心特點是？",
+    options: {
+        A: "通過減速齒輪驅動螺旋槳",
+        B: "僅依靠排氣產生推力",
+        C: "適用於超音速飛行",
+        D: "燃油效率比往復式發動機低"
+    },
+    answer: "A",
+    explanation: "手冊第五章-飛機系統（P150）：渦輪螺旋槳發動機是通過減速齒輪驅動螺旋槳的渦輪發動機，兼具渦輪發動機和螺旋槳的優點，燃油效率好。"
+},
+{
+    id: 132,
+    question: "「電力燃油泵」的主要用途是？",
+    options: {
+        A: "增加燃油壓力，提升發動機功率",
+        B: "發動機啟動時供應燃油，主燃油泵失效時備用",
+        C: "冷卻燃油，防止汽化器結冰",
+        D: "過濾燃油中的雜質"
+    },
+    answer: "B",
+    explanation: "手冊第五章-飛機系統（P123）：電力燃油泵（輔助燃油泵）用於發動機啟動、主燃油泵失效時備用，部分可用於冷天氣協助燃油蒸發。"
+},
+{
+    id: 133,
+    question: "「燃油篩檢器」的主要作用是？",
+    options: {
+        A: "測量燃油量",
+        B: "過濾燃油中的雜質和水分",
+        C: "控制燃油流量",
+        D: "儲存備用燃油"
+    },
+    answer: "B",
+    explanation: "手冊第五章-飛機系統（P126）：燃油篩檢器安裝在燃油選擇器之後，用於清除燃油中的灰塵、沉積物和水分，保護發動機免受損害。"
+},
+{
+    id: 134,
+    question: "「氣冷式發動機」在地面運行時冷卻效率低的原因是？",
+    options: {
+        A: "散熱片數量不足",
+        B: "氣流速度過慢，熱交換效率低",
+        C: "冷卻液迴圈不暢",
+        D: "引擎罩開口被關閉"
+    },
+    answer: "B",
+    explanation: "手冊第五章-飛機系統（P133）：氣冷系統在地面運行、起飛等低空速階段效率不高，因為氣流速度慢，熱交換不充分。"
+},
+{
+    id: 135,
+    question: "「備用空氣源」的作用是？",
+    options: {
+        A: "增加發動機進氣壓力",
+        B: "主空氣篩檢器堵塞時提供進氣",
+        C: "冷卻駕駛艙",
+        D: "為燃油系統加壓"
+    },
+    answer: "B",
+    explanation: "手冊第五章-飛機系統（P112）：進氣系統的備用空氣源通常位於引擎罩內部，當主空氣篩檢器被灰塵或冰堵塞時，自動或手動切換使用，確保發動機獲得足夠空氣。"
+},
+// 模組五：飛行儀錶基礎（136-145題）
+{
+    id: 136,
+    question: "「陀螺儀錶」的核心特性不包括？",
+    options: {
+        A: "空間剛性",
+        B: "進動",
+        C: "磁性",
+        D: "高速旋轉"
+    },
+    answer: "C",
+    explanation: "手冊第六章-飛行儀錶（P170）：陀螺儀錶依賴空間剛性和進動特性，通過高速旋轉工作，不依賴磁性，磁羅盤才基於磁力原理。"
+},
+{
+    id: 137,
+    question: "「航向指示儀」的「進動誤差」表現為？",
+    options: {
+        A: "僅在轉彎時出現偏差",
+        B: "隨時間慢慢偏離正確航向",
+        C: "與磁羅盤的偏差固定不變",
+        D: "高速時偏差劇增"
+    },
+    answer: "B",
+    explanation: "手冊第六章-飛行儀錶（P178）：航向指示儀由於陀螺儀的摩擦力產生進動，會隨時間慢慢偏離正確航向，需要定期與磁羅盤校準。"
+},
+{
+    id: 138,
+    question: "「磁羅盤」的「磁傾角」誤差在什麼情況下更明顯？",
+    options: {
+        A: "靠近磁赤道時",
+        B: "靠近磁極時",
+        C: "高速飛行時",
+        D: "直線飛行時"
+    },
+    answer: "B",
+    explanation: "手冊第六章-飛行儀錶（P181）：磁傾角是地球磁場的垂直分量導致的誤差，在磁赤道上垂直分量最小，靠近磁極時垂直分量增加，誤差更明顯。"
+},
+{
+    id: 139,
+    question: "「垂直速度指示儀（VSI）」的「延遲現象」是指？",
+    options: {
+        A: "高度變化後，儀錶需時間才能顯示正確速率",
+        B: "儀錶反應過快，出現虛假讀數",
+        C: "僅在高速飛行時出現誤差",
+        D: "僅在爬升時出現延遲"
+    },
+    answer: "A",
+    explanation: "手冊第六章-飛行儀錶（P163）：VSI的隔膜外部通過受限制的孔連接靜壓管，高度變化時，外部壓力需時間調整，導致儀錶需要短時間才能顯示正確的爬升/下降速率。"
+},
+{
+    id: 140,
+    question: "「皮托管堵塞但排水孔通暢時」，空速表會顯示？",
+    options: {
+        A: "實際空速",
+        B: "零",
+        C: "偏高",
+        D: "偏低"
+    },
+    answer: "B",
+    explanation: "手冊第六章-飛行儀錶（P167）：皮托管堵塞後，系統內空氣通過排水孔排出，剩餘壓力降至外部空氣壓力，空速表檢測不到壓力差，顯示為零。"
+},
+{
+    id: 141,
+    question: "「高度計」的「Kollsman窗」用於調整什麼？",
+    options: {
+        A: "高度單位（英尺/米）",
+        B: "海平面氣壓設定",
+        C: "高度計靈敏度",
+        D: "溫度補償係數"
+    },
+    answer: "B",
+    explanation: "手冊第六章-飛行儀錶（P160）：高度計的Kollsman窗（大氣壓力設定窗）用於調整海平面氣壓設定，補償非標準大氣壓力，確保高度指示準確。"
+},
+{
+    id: 142,
+    question: "「轉彎協調儀」的「傾角計」小球居中表示？",
+    options: {
+        A: "飛機處於水準飛行",
+        B: "轉彎協調，無側滑",
+        C: "飛機速度穩定",
+        D: "航向無偏差"
+    },
+    answer: "B",
+    explanation: "手冊第六章-飛行儀錶（P175）：轉彎協調儀的傾角計小球居中表示飛機轉彎時副翼和方向舵協調，無內滑或外滑，是協調轉彎的標誌。"
+},
+{
+    id: 143,
+    question: "「靜壓系統堵塞」時，哪個儀錶不受影響？",
+    options: {
+        A: "高度計",
+        B: "空速表",
+        C: "磁羅盤",
+        D: "垂直速度表"
+    },
+    answer: "C",
+    explanation: "手冊第六章-飛行儀錶（P169）：靜壓系統堵塞會影響高度計、空速表和垂直速度表；磁羅盤基於磁力原理工作，與靜壓系統無關，不受影響。"
+},
+{
+    id: 144,
+    question: "「外部空氣溫度錶（OAT）」的主要用途不包括？",
+    options: {
+        A: "計算真實空速",
+        B: "判斷結冰條件",
+        C: "顯示駕駛艙內部溫度",
+        D: "輔助調整燃油混合比"
+    },
+    answer: "C",
+    explanation: "手冊第六章-飛行儀錶（P183）：外部空氣溫度錶提供外界空氣溫度，用於計算真實空速、判斷結冰條件，部分可用於輔助調整燃油混合比，但不顯示駕駛艙內溫度。"
+},
+{
+    id: 145,
+    question: "「姿態指示儀」中，代表真實地平線的是？",
+    options: {
+        A: "縮微小飛機",
+        B: "地平線線條",
+        C: "傾斜刻度",
+        D: "俯仰刻度"
+    },
+    answer: "B",
+    explanation: "手冊第六章-飛行儀錶（P176）：姿態指示儀中的地平線線條固定在陀螺上，保持水平，代表真實地平線，縮微小飛機相對地平線的位置反映飛機姿態。"
+},
+// 模組六：重量與平衡、飛機性能（146-150題）
+{
+    id: 146,
+    question: "飛機「重心（CG）」過靠前會導致？",
+    options: {
+        A: "機頭沉重，著陸時難以拉平",
+        B: "機尾沉重，縱向不穩定",
+        C: "側滾靈活性提升",
+        D: "失速速度降低"
+    },
+    answer: "A",
+    explanation: "手冊第八章-重量和平衡（P201）：重心過靠前會產生頭重現象，著陸時可能導致前輪超載，甚至難以拉平，影響著陸安全。"
+},
+{
+    id: 147,
+    question: "「最大零燃油重量」指的是？",
+    options: {
+        A: "飛機最輕的空重",
+        B: "不包括可用燃油時的最大重量",
+        C: "僅包含機身和發動機的重量",
+        D: "著陸時的最大允許重量"
+    },
+    answer: "B",
+    explanation: "手冊第八章-重量和平衡（P203）：最大零燃油重量是不包括可用燃油時的最大重量，超過此重量可能影響機身結構安全。"
+},
+{
+    id: 148,
+    question: "飛機「起飛距離」隨總重量增加而？",
+    options: {
+        A: "減少",
+        B: "增加",
+        C: "不變",
+        D: "先減後增"
+    },
+    answer: "B",
+    explanation: "手冊第九章-飛機性能（P238）：起飛重量增加會導致升空速度升高、加速所需功率增加，起飛距離隨總重量的平方緩慢增加，例如重量增加10%，起飛距離至少增加21%。"
+},
+{
+    id: 149,
+    question: "「最佳爬升角速度（Vx）」的用途是？",
+    options: {
+        A: "最短時間內獲得最大高度",
+        B: "最短距離內獲得最大高度，越過障礙物",
+        C: "最大燃油效率巡航",
+        D: "最小失速速度"
+    },
+    answer: "B",
+    explanation: "手冊第九章-飛機性能（P223）：最佳爬升角速度（Vx）是飛機在給定水平距離內能獲得最高高度的空速，常用於短場起飛越過障礙物。"
+},
+{
+    id: 150,
+    question: "「反向命令區」的飛行特點是？",
+    options: {
+        A: "空速越高，需要功率越大",
+        B: "空速越低，需要功率越大",
+        C: "僅出現在超音速飛行",
+        D: "與正常飛行控制規律一致"
+    },
+    answer: "B",
+    explanation: "手冊第九章-飛機性能（P233）：反向命令區的飛行特點是低空速時需要更高功率設定來保持恒定高度，與正常控制區（空速越高需功率越大）相反，出現在接近失速的低速階段。"
+},
+// 第151-200題题库（接續之前的questionBank數組）
+{
+    id: 151,
+    question: "潤滑油溫度錶顯示高溫，可能的原因不包括？",
+    options: {
+        A: "油管堵塞",
+        B: "潤滑油量不足",
+        C: "潤滑油製冷器阻塞",
+        D: "冷天氣下潤滑油粘度過高"
+    },
+    answer: "D",
+    explanation: "手冊第五章-飛機系統（P131）：潤滑油溫度高可能是油管堵塞、油量不足或製冷器阻塞；低溫讀數可能是冷天氣潤滑油粘度不合適，而非高溫原因。"
+},
+{
+    id: 152,
+    question: "氣冷式發動機的「通風片」關閉時的作用是？",
+    options: {
+        A: "增加熱空氣排出，降低溫度",
+        B: "限制熱氣流排出，升高發動機溫度",
+        C: "減少進氣量，降低功率",
+        D: "增加散熱片面積，提升冷卻效率"
+    },
+    answer: "B",
+    explanation: "手冊第五章-飛機系統（P133）：通風片是鉸鏈在開口上的蓋子，溫度低時關閉，限制熱氣流排出，使發動機溫度升高。"
+},
+{
+    id: 153,
+    question: "飛機電力系統中「匯流條」的主要功能是？",
+    options: {
+        A: "存儲電能",
+        B: "連結主電力系統與用電設備，提供統一電壓接入點",
+        C: "轉換交流電為直流電",
+        D: "保護電路免於超載"
+    },
+    answer: "B",
+    explanation: "手冊第五章-飛機系統（P135）：匯流條作為電力系統的接線端子，簡化佈線，提供分佈於系統的常用電壓接入點，連結主電力系統和用電設備。"
+},
+{
+    id: 154,
+    question: "小飛機液壓系統廣泛使用的「礦物基液壓流體」的特點是？",
+    options: {
+        A: "粘性隨溫度變化大",
+        B: "化學性穩定，不易腐蝕",
+        C: "無需添加抑制發泡劑",
+        D: "與煤油不兼容"
+    },
+    answer: "B",
+    explanation: "手冊第五章-飛機系統（P137）：礦物基液壓流體是類似煤油的石油產品，化學特性穩定，粘性隨溫度變化小，含抑制發泡和防腐蝕添加劑。"
+},
+{
+    id: 155,
+    question: "「前三點式起落架」的主輪位置與重心的關係是？",
+    options: {
+        A: "主輪位於重心前方",
+        B: "主輪位於重心後方",
+        C: "主輪與重心重合",
+        D: "主輪位置與重心無關"
+    },
+    answer: "A",
+    explanation: "手冊第五章-飛機系統（P138）：前三點式起落架的重心位於主輪前方，提供更好的方向穩定性，防止地面滑移。"
+},
+{
+    id: 156,
+    question: "機艙增壓系統的「排氣閥」主要作用是？",
+    options: {
+        A: "直接加壓機艙空氣",
+        B: "調節空氣流出，維持機艙壓力",
+        C: "過濾機艙空氣中的雜質",
+        D: "提供新鮮空氣進入機艙"
+    },
+    answer: "B",
+    explanation: "手冊第五章-飛機系統（P141）：排氣閥通過調節空氣的流出，使空氣持續流入增壓區域，從而維持機艙內外的壓力差。"
+},
+{
+    id: 157,
+    question: "「連續流供氧系統」的儲氣囊作用是？",
+    options: {
+        A: "存儲100%純氧，緊急時使用",
+        B: "收集呼氣時的氧氣，提升吸氣流速",
+        C: "冷卻氧氣，避免面罩過熱",
+        D: "過濾氧氣中的雜質"
+    },
+    answer: "B",
+    explanation: "手冊第五章-飛機系統（P145）：連續流供氧系統的儲氣囊在使用者呼氣時收集氧氣，使吸氣迴圈時有較高吸氣流速，降低空氣稀釋程度。"
+},
+{
+    id: 158,
+    question: "風擋玻璃「電加熱除冰系統」的使用注意事項是？",
+    options: {
+        A: "地面運行時可長時間開啟",
+        B: "飛行時禁止使用，避免羅盤偏差",
+        C: "僅能在飛行時使用，地面使用易過熱損壞",
+        D: "加熱時不會影響其他儀錶"
+    },
+    answer: "C",
+    explanation: "手冊第五章-飛機系統（P147）：電加熱風擋僅能在飛行時使用，地面運行時開啟會過熱導致損壞，且電流會導致羅盤偏差誤差。"
+},
+{
+    id: 159,
+    question: "渦輪發動機的「N1指示儀」顯示的是？",
+    options: {
+        A: "高壓壓縮機旋轉速度",
+        B: "低壓壓縮機旋轉速度（設計轉速百分比）",
+        C: "渦輪出口溫度",
+        D: "發動機壓力比"
+    },
+    answer: "B",
+    explanation: "手冊第五章-飛機系統（P153）：N1表示低壓壓縮機的旋轉速度，以設計轉速的百分比顯示，由N1渦輪機葉輪調節。"
+},
+{
+    id: 160,
+    question: "排氣系統的「EGT儀錶」主要用於監視什麼？",
+    options: {
+        A: "潤滑油溫度",
+        B: "渦輪節溫度，避免過熱",
+        C: "燃油壓力",
+        D: "機艙加熱溫度"
+    },
+    answer: "B",
+    explanation: "手冊第五章-飛機系統（P152）：EGT（排氣溫度）表用於監視渦輪節溫度，防止渦輪葉片和排氣節部件過熱，是發動機運行限制的重要參考。"
+},
+// 模組二：飛行儀錶進階（161-170題）
+{
+    id: 161,
+    question: "皮托管堵塞但排水孔通暢時，空速表會顯示什麼？",
+    options: {
+        A: "實際空速",
+        B: "零",
+        C: "偏高",
+        D: "僅在爬升時有指示"
+    },
+    answer: "B",
+    explanation: "手冊第六章-飛行儀錶（P167）：皮托管堵塞後，系統內空氣通過排水孔排出，剩餘壓力降至外部空氣壓力，空速表檢測不到壓力差，顯示為零。"
+},
+{
+    id: 162,
+    question: "靜壓系統堵塞時，高度計的表現是？",
+    options: {
+        A: "指示高度逐漸降低",
+        B: "固定在堵塞發生時的高度",
+        C: "指示高度快速升高",
+        D: "與實際高度偏差隨空速變化"
+    },
+    answer: "B",
+    explanation: "手冊第六章-飛行儀錶（P169）：靜壓系統堵塞後，截留的靜壓使高度計固定在堵塞發生時的高度，不再隨實際高度變化。"
+},
+{
+    id: 163,
+    question: "陀螺儀錶的「空間剛性」特性指的是？",
+    options: {
+        A: "陀螺儀保持在其旋轉平面內的固定位置",
+        B: "陀螺對偏轉力的反應是旋轉90度",
+        C: "陀螺旋轉速度越快，進動越明顯",
+        D: "陀螺僅能繞單一軸旋轉"
+    },
+    answer: "A",
+    explanation: "手冊第六章-飛行儀錶（P170）：空間剛性是陀螺儀的核心特性，指陀螺儀會保持在它所旋轉平面內的固定位置，不受安裝基座姿態變化影響。"
+},
+{
+    id: 164,
+    question: "磁羅盤的「磁偏角」與「羅盤偏差」的區別在於？",
+    options: {
+        A: "磁偏角是飛機內部磁場導致，偏差是地球磁極與地理極差異導致",
+        B: "磁偏角是地球磁極與地理極差異導致，偏差是飛機內部磁場導致",
+        C: "兩者均由地球磁場變化導致",
+        D: "兩者均由飛機電子設備導致"
+    },
+    answer: "B",
+    explanation: "手冊第六章-飛行儀錶（P180）：磁偏角是磁北極與真北極的角誤差；羅盤偏差是飛機內部金屬或電子設備的磁場扭曲地球磁場導致的誤差。"
+},
+{
+    id: 165,
+    question: "「暫態垂直速度指示儀（IVSI）」相比普通VSI的優勢是？",
+    options: {
+        A: "體積更小，重量更輕",
+        B: "結合加速計，補償延遲現象",
+        C: "僅顯示穩定爬升/下降速率，不顯示趨勢",
+        D: "無需依賴靜壓系統"
+    },
+    answer: "B",
+    explanation: "手冊第六章-飛行儀錶（P163）：IVSI結合加速計來補償典型VSI的延遲現象，能更快指示垂直速度變化，減少反應間隔。"
+},
+{
+    id: 166,
+    question: "航向指示儀需要定期與磁羅盤校準的原因是？",
+    options: {
+        A: "受磁偏角影響",
+        B: "受羅盤偏差影響",
+        C: "存在進動誤差，會逐漸偏離正確航向",
+        D: "受氣溫變化影響"
+    },
+    answer: "C",
+    explanation: "手冊第六章-飛行儀錶（P178）：航向指示儀因陀螺儀摩擦力產生進動誤差，會隨時間慢慢偏離正確航向，通常每15分鐘需與磁羅盤校準一次。"
+},
+{
+    id: 167,
+    question: "高度計的「備用靜壓源」啟用後，儀錶指示會如何變化？",
+    options: {
+        A: "高度計指示低於實際高度",
+        B: "高度計指示高於實際高度",
+        C: "空速表指示低於實際空速",
+        D: "垂直速度表指示下降"
+    },
+    answer: "B",
+    explanation: "手冊第六章-飛行儀錶（P157）：備用靜壓源通常連通駕駛艙壓力，受文氏管效應影響壓力更低，啟用後高度計會指示高於實際高度，空速表指示大於實際空速。"
+},
+{
+    id: 168,
+    question: "轉彎協調儀的「傾角計」小球偏向轉彎外側，說明？",
+    options: {
+        A: "轉彎協調，無側滑",
+        B: "轉彎速度過快，出現外滑",
+        C: "轉彎速度過慢，出現內滑",
+        D: "飛機處於水平飛行"
+    },
+    answer: "B",
+    explanation: "手冊第六章-飛行儀錶（P175）：外滑時，對應傾斜角的轉彎速度過快，傾角計小球向轉彎外側移動，需增加傾斜角或降低轉彎速度糾正。"
+},
+{
+    id: 169,
+    question: "姿態指示儀的「俯仰限制」通常範圍是？",
+    options: {
+        A: "30-40度",
+        B: "60-70度",
+        C: "90-100度",
+        D: "110-120度"
+    },
+    answer: "B",
+    explanation: "手冊第六章-飛行儀錶（P176）：姿態指示儀的俯仰限制通常從60度到70度，超過限制可能導致儀錶混亂或溢出，現代儀錶多不會混亂。"
+},
+{
+    id: 170,
+    question: "外部空氣溫度錶（OAT）的傳感元件核心是？",
+    options: {
+        A: "雙金屬溫度計",
+        B: "壓力傳感器",
+        C: "磁場感應器",
+        D: "光學探頭"
+    },
+    answer: "A",
+    explanation: "手冊第六章-飛行儀錶（P183）：OAT的傳感元件包含雙金屬溫度計，由兩種不同金屬焊接成條並扭成螺旋狀，隨溫度變化帶動指標運動。"
+},
+// 模組三：飛行手冊與文檔（171-180題）
+{
+    id: 171,
+    question: "「飛行員操作手冊（POH）」若作為主要參考，需滿足什麼條件？",
+    options: {
+        A: "僅需製造商簽字確認",
+        B: "扉頁需聲明文檔段落由FAA批准為飛機飛行手冊（AFM）",
+        C: "無需FAA批准，僅需符合製造商標準",
+        D: "需單獨附帶適航證書"
+    },
+    answer: "B",
+    explanation: "手冊第七章-飛行手冊和其它文檔（P184）：若POH作為主要參考而非AFM，必須在扉頁包含聲明，表明文檔段落由FAA批准為AFM。"
+},
+{
+    id: 172,
+    question: "「標準適航證書」的有效期是？",
+    options: {
+        A: "1年",
+        B: "2年",
+        C: "至飛機未經必要維護前，且完全在美國註冊",
+        D: "永久有效，無需更換"
+    },
+    answer: "C",
+    explanation: "手冊第七章-飛行手冊和其它文檔（P192）：標準適航證書一直有效至飛機未經必要維護前，且完全在美國註冊，其有效性取決於飛機適航狀態。"
+},
+{
+    id: 173,
+    question: "飛機「年度檢查」的執行者不包括？",
+    options: {
+        A: "持有檢查授權的FAA認證機身和發動機機械師",
+        B: "飛機製造商",
+        C: "認證的維修站",
+        D: "未經認證的私人維修人員"
+    },
+    answer: "D",
+    explanation: "手冊第七章-飛行手冊和其它文檔（P193）：年度檢查需由認證的持有檢查授權的機身和發動機機械師、製造商或認證維修站執行，未經認證人員無權執行。"
+},
+{
+    id: 174,
+    question: "「100小時檢查」主要適用於哪類飛機？",
+    options: {
+        A: "所有重量超過12500磅的飛機",
+        B: "12500磅以下、承載乘客或用於租用飛行訓練的飛機",
+        C: "僅渦輪噴氣發動機驅動的飛機",
+        D: "僅實驗性飛機"
+    },
+    answer: "B",
+    explanation: "手冊第七章-飛行手冊和其它文檔（P193）：100小時檢查適用於12500磅以下、受雇承載乘客或用於租用飛行訓練的飛機，需每100小時執行一次。"
+},
+{
+    id: 175,
+    question: "「最少裝備表（MEL）」的作用是？",
+    options: {
+        A: "列出飛機必須安裝的核心設備，缺一不可",
+        B: "允許飛機在部分非關鍵設備失效時，仍可安全運行",
+        C: "僅用於實驗性飛機",
+        D: "替代飛機飛行手冊的性能數據"
+    },
+    answer: "B",
+    explanation: "手冊第七章-飛行手冊和其它文檔（P194）：MEL首次允許飛機在認定為對飛行安全不重要的設備失效時，仍可運行，未配MEL的91部運營者可按規延遲維修非關鍵設備。"
+},
+{
+    id: 176,
+    question: "「預防性維護」可由以下哪類人員執行？",
+    options: {
+        A: "飛行學員",
+        B: "體育飛行員",
+        C: "認證飛行員（非飛行學員、體育/娛樂飛行員），且飛機不用於航空運輸",
+        D: "未經認證的飛機所有者"
+    },
+    answer: "C",
+    explanation: "手冊第七章-飛行手冊和其它文檔（P195）：除飛行學員、體育/娛樂飛行員外的認證飛行員，可對自有或運作的非航空運輸飛機執行預防性維護。"
+},
+{
+    id: 177,
+    question: "「重要修理和更換」需通過什麼文件批准後方可投入服役？",
+    options: {
+        A: "飛機註冊證書",
+        B: "FAA表格337",
+        C: "最少裝備表",
+        D: "適航指令"
+    },
+    answer: "B",
+    explanation: "手冊第七章-飛行手冊和其它文檔（P195）：重要修理和更換需根據FAA表格337，由認證維修站、持有檢查授權的機械師或管理局代表批准後投入服役。"
+},
+{
+    id: 178,
+    question: "「特殊飛行許可」的頒發目的不包括？",
+    options: {
+        A: "讓未滿足適航要求但可安全飛行的飛機飛往維修地點",
+        B: "用於飛機交付和出口",
+        C: "允許超重飛機飛越無足夠著陸設施的區域",
+        D: "替代年度檢查，延長飛機運行期限"
+    },
+    answer: "D",
+    explanation: "手冊第七章-飛行手冊和其它文檔（P196）：特殊飛行許可用於飛機飛往維修地、交付出口、疏散危險區或超重飛越特殊區域，不可替代年度檢查。"
+},
+{
+    id: 179,
+    question: "「適航指令（ADs）」的性質是？",
+    options: {
+        A: "建議性文件，飛機所有者可選擇是否遵守",
+        B: "規章性文件，必須遵守（除非有豁免）",
+        C: "僅適用於新製造飛機",
+        D: "僅針對發動機系統的維護建議"
+    },
+    answer: "B",
+    explanation: "手冊第七章-飛行手冊和其它文檔（P197）：ADs是規章性文件，用於通知不安全狀況及糾正措施，飛機所有者和運營者必須遵守，除非獲得具體豁免。"
+},
+{
+    id: 180,
+    question: "飛機所有者/運營者的職責不包括？",
+    options: {
+        A: "保持飛機有最新的適航證書和註冊證書",
+        B: "遵守所有適用的適航指令",
+        C: "自行修改飛機設計以提升性能",
+        D: "及時通知FAA郵寄地址變更或飛機銷售信息"
+    },
+    answer: "C",
+    explanation: "手冊第七章-飛行手冊和其它文檔（P198）：所有者/運營者需保持證書有效、遵守ADs、記錄維修、通知資訊變更，不可自行修改飛機設計，需經認證維修或批准。"
+},
+// 模組四：重量與平衡（181-190題）
+{
+    id: 181,
+    question: "飛機「重心（CG）」過後會導致？",
+    options: {
+        A: "機頭沉重，著陸難以拉平",
+        B: "縱向穩定性降低，失速恢復能力下降",
+        C: "側滾困難，機動性變差",
+        D: "失速速度升高"
+    },
+    answer: "B",
+    explanation: "手冊第八章-重量和平衡（P201）：重心過後會降低縱向穩定性，減弱飛機從失速和螺旋中恢復的能力，還可能導致控制力過輕，易無意間施加過大應力。"
+},
+{
+    id: 182,
+    question: "「力矩」的計算公式是？",
+    options: {
+        A: "重量÷力臂",
+        B: "重量×力臂",
+        C: "力臂÷重量",
+        D: "重量+力臂"
+    },
+    answer: "B",
+    explanation: "手冊第八章-重量和平衡（P203）：力矩是物體重量和它的力臂（從基準線到重心的距離）之乘積，單位為磅-英寸，總力矩用於計算重心位置。"
+},
+{
+    id: 183,
+    question: "「最大零燃油重量」指的是？",
+    options: {
+        A: "飛機空重（不含任何燃油和載荷）",
+        B: "不包括可用燃油時的最大允許重量",
+        C: "僅包含機身和發動機的重量",
+        D: "著陸時的最大允許重量"
+    },
+    answer: "B",
+    explanation: "手冊第八章-重量和平衡（P203）：最大零燃油重量是不包括可用燃油時的最大重量，超過此重量可能影響機身結構安全。"
+},
+{
+    id: 184,
+    question: "計算重心時，「基準線」的作用是？",
+    options: {
+        A: "直接確定重心位置",
+        B: "作為所有力臂測量的參考基準",
+        C: "標記重心的前後限制",
+        D: "計算飛機總重量"
+    },
+    answer: "B",
+    explanation: "手冊第八章-重量和平衡（P202）：基準線是製造商確立的假想豎直平面或直線，所有力臂（從基準線到物體重心的距離）的測量都從這裡開始。"
+},
+{
+    id: 185,
+    question: "飛機重量增加10%，起飛距離大約增加多少？",
+    options: {
+        A: "10%",
+        B: "21%-30%",
+        C: "50%",
+        D: "100%"
+    },
+    answer: "B",
+    explanation: "手冊第八章-重量和平衡（P199）：起飛距離隨總重量的平方緩慢變化，重量增加10%，起飛速度增加5%，加速度降低至少9%，起飛距離至少增加21%，高推重比飛機約21%-22%，低推重比約25%-30%。"
+},
+{
+    id: 186,
+    question: "「地板載重限制」指的是？",
+    options: {
+        A: "飛機最大總重量",
+        B: "地板每平方英寸或英尺可承受的最大重量",
+        C: "行李艙的最大載重量",
+        D: "乘客的最大個人体重"
+    },
+    answer: "B",
+    explanation: "手冊第八章-重量和平衡（P202）：地板載重限制是製造商提供的數據，指地板每平方英寸或英尺可以承受的最大重量，避免超載損壞地板結構。"
+},
+{
+    id: 187,
+    question: "將100磅的行李從後部貨艙（測站150）移到前部貨艙（測站30），對重心的影響是？",
+    options: {
+        A: "重心向前移動",
+        B: "重心向後移動",
+        C: "重心不變",
+        D: "重心先向前再向後移動"
+    },
+    answer: "A",
+    explanation: "手冊第八章-重量和平衡（P211）：重量向前移動時，總力矩降低，重心會向基準線前方移動；反之向後移動。100磅行李從測站150移到30（向前移動120英寸），會使重心向前偏移。"
+},
+{
+    id: 188,
+    question: "「密度高度」與飛機性能的關係是？",
+    options: {
+        A: "密度高度越高，空氣密度越大，性能越好",
+        B: "密度高度越高，空氣密度越小，性能越差",
+        C: "密度高度與性能無關",
+        D: "密度高度僅影響巡航速度，不影響起飛性能"
+    },
+    answer: "B",
+    explanation: "手冊第九章-飛機性能（P217）：密度高度是經非標準溫度修正後的壓力高度，密度高度越高，空氣密度越小，發動機功率、螺旋槳推力和機翼升力均降低，飛機性能越差。"
+},
+{
+    id: 189,
+    question: "計算重心時，若物體位於基準線前方，力臂的符號是？",
+    options: {
+        A: "正（+）",
+        B: "負（-）",
+        C: "零",
+        D: "無需標註符號"
+    },
+    answer: "B",
+    explanation: "手冊第八章-重量和平衡（P202）：力臂是從基準線到物體重心的距離，在基準線之後測量為正（+），在基準線之前測量為負（-）。"
+},
+{
+    id: 190,
+    question: "「有效載荷」指的是？",
+    options: {
+        A: "飛機基本空重",
+        B: "乘客、貨物和行李的重量",
+        C: "可用燃油的重量",
+        D: "飛機最大總重量與基本空重的差值"
+    },
+    answer: "B",
+    explanation: "手冊第八章-重量和平衡（P203）：有效載荷（GAMA標準）指乘客、貨物和行李的重量，不包含燃油和飛機自身結構重量。"
+},
+// 模組五：飛機性能（191-200題）
+{
+    id: 191,
+    question: "「地面效應」對飛機的影響不包括？",
+    options: {
+        A: "誘導阻力降低",
+        B: "升力係數增加",
+        C: "機頭下沉趨勢（水準尾翼下洗流減弱）",
+        D: "寄生阻力顯著增加"
+    },
+    answer: "D",
+    explanation: "手冊第九章-飛機性能（P231）：地面效應會減弱翼尖渦流，降低誘導阻力，增加升力係數；水準尾翼下洗流減弱會導致機頭下沉；寄生阻力不受地面效應明顯影響。"
+},
+{
+    id: 192,
+    question: "「反向命令區」的運行特點是？",
+    options: {
+        A: "空速越高，需要功率越大",
+        B: "空速越低，需要功率越大（保持恒定高度）",
+        C: "僅出現在超音速飛行",
+        D: "與正常控制區的運行規律一致"
+    },
+    answer: "B",
+    explanation: "手冊第九章-飛機性能（P233）：反向命令區位於最小需求功率速度和失速速度之間，保持恒定高度時，空速越低需要功率越大，與正常控制區（空速越高需功率越大）相反。"
+},
+{
+    id: 193,
+    question: "迎風對起飛距離的影響是？",
+    options: {
+        A: "迎風越大，起飛距離越長",
+        B: "迎風越大，起飛距離越短",
+        C: "迎風對起飛距離無影響",
+        D: "僅迎風超過10節時才影響起飛距離"
+    },
+    answer: "B",
+    explanation: "手冊第九章-飛機性能（P238）：迎風使飛機能以較低地面速度達到升空速度，起飛距離減短；起飛空速10%的迎風，可減少起飛距離約19%。"
+},
+{
+    id: 194,
+    question: "「最佳爬升角速度（Vx）」與「最佳爬升率速度（Vy）」的區別是？",
+    options: {
+        A: "Vx是最短時間內獲得最大高度，Vy是最短距離內獲得最大高度",
+        B: "Vx是最短距離內獲得最大高度，Vy是最短時間內獲得最大高度",
+        C: "兩者均以最短時間獲得最大高度，僅速度不同",
+        D: "兩者均以最短距離獲得最大高度，僅速度不同"
+    },
+    answer: "B",
+    explanation: "手冊第九章-飛機性能（P223）：Vx是最短距離內獲得最大高度的空速，用於短場起飛越過障礙物；Vy是最短時間內獲得最大高度的空速，用於快速爬升。"
+},
+{
+    id: 195,
+    question: "跑道「上坡坡度」對起飛性能的影響是？",
+    options: {
+        A: "阻礙加速，起飛滑跑距離延長",
+        B: "幫助加速，起飛滑跑距離縮短",
+        C: "僅影響著陸距離，不影響起飛",
+        D: "無論坡度大小，均不影響起飛性能"
+    },
+    answer: "A",
+    explanation: "手冊第九章-飛機性能（P234）：上坡跑道會阻礙飛機起飛時的加速，導致地面滑跑距離延長；下坡跑道則有助於加速，縮短起飛距離。"
+},
+{
+    id: 196,
+    question: "「最大航程」對應的飛行條件是？",
+    options: {
+        A: "最大升阻比（L/D Max）對應的空速",
+        B: "最小功率需求對應的空速",
+        C: "最大巡航速度",
+        D: "最小失速速度"
+    },
+    answer: "A",
+    explanation: "手冊第九章-飛機性能（P229）：最大航程條件在最大升阻比（L/D Max）處獲得，此時每燃油流量的速度最大，能實現最遠飛行距離；最小功率需求對應最大續航時間。"
+},
+{
+    id: 197,
+    question: "濕滑跑道對著陸性能的影響是？",
+    options: {
+        A: "制動效率提升，著陸滑跑距離縮短",
+        B: "制動效率降低，易發生動態打滑，著陸滑跑距離延長",
+        C: "僅影響方向控制，不影響制動距離",
+        D: "無影響，因為氣動阻力足以減速"
+    },
+    answer: "B",
+    explanation: "手冊第九章-飛機性能（P236）：濕滑跑道降低輪胎與地面摩擦力，制動效率下降，易發生動態打滑（輪胎在水面滾動而非接觸跑道），導致著陸滑跑距離延長。"
+},
+{
+    id: 198,
+    question: "飛機著陸重量增加10%，著陸距離大約增加多少？",
+    options: {
+        A: "5%",
+        B: "10%",
+        C: "21%",
+        D: "50%"
+    },
+    answer: "B",
+    explanation: "手冊第九章-飛機性能（P240）：最小著陸距離隨總重量直接正比變化，著陸重量增加10%，著陸速度增加5%，著陸距離增加10%。"
+},
+{
+    id: 199,
+    question: "「服務升限」指的是？",
+    options: {
+        A: "飛機能達到的最高高度（零爬升率）",
+        B: "飛機不能再以大於100英尺/分鐘速度爬升的高度",
+        C: "僅渦輪發動機飛機的最大爬升高度",
+        D: "飛機能維持最大巡航速度的最高高度"
+    },
+    answer: "B",
+    explanation: "手冊第九章-飛機性能（P226）：服務升限是飛機不能再以大於100英尺/分鐘速度爬升的高度；絕對升限是零爬升率的最高高度。"
+},
+{
+    id: 200,
+    question: "「動態打滑」的最小速度計算公式是？",
+    options: {
+        A: "9×√輪胎壓力（PSI）",
+        B: "√輪胎壓力（PSI）×6",
+        C: "輪胎壓力（PSI）×9",
+        D: "輪胎壓力（PSI）+9"
+    },
+    answer: "A",
+    explanation: "手冊第九章-飛機性能（P236）：動態打滑的最小速度（節）=9×√輪胎壓力（PSI），例如輪胎壓力36 PSI時，最小打滑速度=9×6=54節。"
+},
+// 第201-250題题库（接續之前的questionBank數組）
+{
+    id: 201,
+    question: "運輸類飛機起飛第二階段爬升，雙發飛機要求的爬升斜率是？",
+    options: {
+        A: "1.2%",
+        B: "2.4%",
+        C: "2.7%",
+        D: "3.0%"
+    },
+    answer: "B",
+    explanation: "手冊第九章-飛機性能（P261）：起飛第二階段爬升，雙發飛機要求的爬升斜率為2.4%，三發飛機2.7%，四發飛機3.0%。"
+},
+{
+    id: 202,
+    question: "對流層內溫度的平均遞減率是？",
+    options: {
+        A: "每1000英尺下降1攝氏度",
+        B: "每1000英尺下降2攝氏度",
+        C: "每1000英尺上升2攝氏度",
+        D: "溫度不隨高度變化"
+    },
+    answer: "B",
+    explanation: "手冊第十章-天氣理論（P266）：在對流層內，溫度以高度每升高1000英尺2攝氏度的比率下降。"
+},
+{
+    id: 203,
+    question: "METAR報告中出現「AUTO」標記，含義是？",
+    options: {
+        A: "報告已修正",
+        B: "報告來自自動化觀測站",
+        C: "天氣正在快速變化",
+        D: "機場關閉"
+    },
+    answer: "B",
+    explanation: "手冊第十一章-天氣報告與預報（P300）：METAR中的「AUTO」符號表示報告來自於一個自動化的來源，備註部分會標註AO1或AO2表示降水量感測器類型。"
+},
+{
+    id: 204,
+    question: "兩排VASI（目視進近坡度指示燈）的標準下滑道斜度是？",
+    options: {
+        A: "2度",
+        B: "3度",
+        C: "4度",
+        D: "5度"
+    },
+    answer: "B",
+    explanation: "手冊第十二章-機場的運行（P327）：兩排VASI裝置提供的目視下滑道斜度通常設定為3度，三排系統則提供兩個下滑通道。"
+},
+{
+    id: 205,
+    question: "A類空域的高度範圍是？",
+    options: {
+        A: "地面到10000英尺MSL",
+        B: "18000英尺MSL到60000英尺MSL",
+        C: "1200英尺AGL到18000英尺MSL",
+        D: "60000英尺MSL以上"
+    },
+    answer: "B",
+    explanation: "手冊第十三章-空域（P341）：A類空域一般是從18000英尺平均海平面高度到包括60000英尺高度層在內的高度範圍。"
+},
+{
+    id: 206,
+    question: "VOR導航系統的運行頻率範圍是？",
+    options: {
+        A: "200-415KHz",
+        B: "108.0-117.95MHz",
+        C: "118.0-136.975MHz",
+        D: "90-110KHz"
+    },
+    answer: "B",
+    explanation: "手冊第十四章-導航（P374）：VOR地面台是在VHF頻段108.0-117.95MHz內發射的，受視距傳輸限制。"
+},
+{
+    id: 207,
+    question: "冷鋒的平均移動速度是？",
+    options: {
+        A: "10-25英里/小時",
+        B: "25-30英里/小時",
+        C: "30-50英里/小時",
+        D: "50-60英里/小時"
+    },
+    answer: "B",
+    explanation: "手冊第十章-天氣理論（P292）：冷鋒比暖鋒移動更快，以25到30英里每小時的速度前進，極端冷鋒可達60英里每小時。"
+},
+{
+    id: 208,
+    question: "微爆（microburst）的主要危險是？",
+    options: {
+        A: "長時間強降雨",
+        B: "快速風向變化和強下沉氣流",
+        C: "持續性雷電",
+        D: "大範圍結冰"
+    },
+    answer: "B",
+    explanation: "手冊第十章-天氣理論（P279）：微爆會產生速度高達6000英尺每分鐘的向下氣流，並在幾秒鐘內產生45節以上的風向變化，導致飛機難以控制。"
+},
+{
+    id: 209,
+    question: "積雨雲（Cumulonimbus）屬於哪類雲層？",
+    options: {
+        A: "低雲",
+        B: "中雲",
+        C: "高雲",
+        D: "垂直擴展的雲"
+    },
+    answer: "D",
+    explanation: "手冊第十章-天氣理論（P286）：垂直擴展的雲包括積雲和積雨雲，其底部位於低到中高度雲底區域，可延伸到高高度雲層。"
+},
+{
+    id: 210,
+    question: "低空風切變的定義是？",
+    options: {
+        A: "高空風速超過50節",
+        B: "小區域內風速和/或方向的突然劇烈變化",
+        C: "鋒面過境時的風向變化",
+        D: "山區的下坡氣流"
+    },
+    answer: "B",
+    explanation: "手冊第十章-天氣理論（P278）：風切變是指在一個非常小的區域內風速和/或方向的突然的、激烈的變化，低空風切變因飛機接近地面而特別危險。"
+},
+{
+    id: 211,
+    question: "TAF（終端機場預報）的有效期是？",
+    options: {
+        A: "6小時",
+        B: "12小時",
+        C: "24小時",
+        D: "48小時"
+    },
+    answer: "C",
+    explanation: "手冊第十一章-天氣報告與預報（P306）：每一份TAF報告有效期只有24小時，每天更新4次，時間分別為00:00Z、06:00Z、12:00Z、18:00Z。"
+},
+{
+    id: 212,
+    question: "PIREP（飛行員天氣報告）的主要作用是？",
+    options: {
+        A: "預報未來24小時天氣",
+        B: "提供飛行中實時天氣狀況（如紊流、結冰）",
+        C: "記錄機場日常天氣數據",
+        D: "發布雷暴警報"
+    },
+    answer: "B",
+    explanation: "手冊第十一章-天氣報告與預報（P303）：PIREP提供飛行時的重要資訊，可確認雲底/雲頂高度、風切變、紊流、結冰地點等，無法從其他來源收集。"
+},
+{
+    id: 213,
+    question: "平行跑道的區分標記是？",
+    options: {
+        A: "不同的數字編號",
+        B: "數字後加L（左）、C（中）、R（右）",
+        C: "不同顏色的跑道燈",
+        D: "跑道長度不同"
+    },
+    answer: "B",
+    explanation: "手冊第十二章-機場的運行（P324）：同向設計的平行跑道，通過在跑道編號後加上字母區分，例如跑道36L（左邊）、36C（中間）、36R（右邊）。"
+},
+{
+    id: 214,
+    question: "滑行道等待位置標記的組成是？",
+    options: {
+        A: "一條黃色實線",
+        B: "四條黃色線（兩條實線、兩條虛線）",
+        C: "紅色實線和虛線",
+        D: "白色網格線"
+    },
+    answer: "B",
+    explanation: "手冊第十二章-機場的運行（P325）：滑行道等待位置標記由四條黃色線組成，兩條實線，兩條虛線，實線為飛機等待的位置。"
+},
+{
+    id: 215,
+    question: "VASI指示「高於下滑道」時，飛行員看到的燈光顏色是？",
+    options: {
+        A: "兩排紅光",
+        B: "近排紅光、遠排白光",
+        C: "兩排白光",
+        D: "近排白光、遠排紅光"
+    },
+    answer: "C",
+    explanation: "手冊第十二章-機場的運行（P327）：VASI的基本原理是紅白顏色區分，高於下滑道時看到兩排白光，位於下滑道時近排紅光、遠排白光，低於時兩排紅光。"
+},
+{
+    id: 216,
+    question: "風向袋不僅能指示風向，還能用於？",
+    options: {
+        A: "測量風切變",
+        B: "估計風速和陣風",
+        C: "判斷結冰條件",
+        D: "確認跑道坡度"
+    },
+    answer: "B",
+    explanation: "手冊第十二章-機場的運行（P331）：風向袋不僅指明風向，還能讓飛行員估計風速——強風中會被拉直，陣風中會來回運動。"
+},
+{
+    id: 217,
+    question: "通用航空常用的VHF無線電頻率範圍是？",
+    options: {
+        A: "108.0-117.95MHz",
+        B: "118.000-136.975MHz",
+        C: "200-415KHz",
+        D: "90-110KHz"
+    },
+    answer: "B",
+    explanation: "手冊第十二章-機場的運行（P332）：VHF無線電設備工作在118.000MHz到136.975MHz的頻率範圍，用於航空通信。"
+},
+{
+    id: 218,
+    question: "在同一跑道上，小飛機跟在大飛機後起飛時，應採取的渦流規避措施是？",
+    options: {
+        A: "在大飛機離地點之前離地",
+        B: "在大飛機離地點之後離地",
+        C: "降低起飛速度",
+        D: "增加爬升角度"
+    },
+    answer: "A",
+    explanation: "手冊第十二章-機場的運行（P337）：在同一跑道上大飛機之後起飛時，小飛機要在大飛機的離地點之前離地，在它的爬升通道上方爬升。"
+},
+{
+    id: 219,
+    question: "B類空域的高度範圍通常是？",
+    options: {
+        A: "地面到10000英尺MSL",
+        B: "10000英尺MSL到18000英尺MSL",
+        C: "地面到5000英尺MSL",
+        D: "18000英尺MSL以上"
+    },
+    answer: "A",
+    explanation: "手冊第十三章-空域（P342）：B類空域通常是全國最繁忙的機場周圍從地面到10000英尺平均海平面高度的空域。"
+},
+{
+    id: 220,
+    question: "G類空域的定義是？",
+    options: {
+        A: "有控制塔的機場周圍空域",
+        B: "未指定為A、B、C、D、E類的空域",
+        C: "僅用於軍事訓練的空域",
+        D: "高空巡航空域"
+    },
+    answer: "B",
+    explanation: "手冊第十三章-空域（P343）：G類空域是未指定為A、B、C、D、E類空域的部分，從地面延伸到上方的E類空域底部。"
+},
+{
+    id: 221,
+    question: "VOR接收機的精度檢查不包括以下哪種方法？",
+    options: {
+        A: "FAA的VOR測試工具（VOT）",
+        B: "被認證的空中檢查點",
+        C: "目視觀察雲層移動",
+        D: "被認證的機場地面檢查點"
+    },
+    answer: "C",
+    explanation: "手冊第十四章-導航（P375）：VOR精度檢查方法包括FAA的VOT、被認證的空中檢查點、被認證的機場地面檢查點，目視觀察雲層移動無法檢查VOR精度。"
+},
+{
+    id: 222,
+    question: "ADF（自動定向儀）對應的NDB台運行頻段是？",
+    options: {
+        A: "108.0-117.95MHz",
+        B: "200-415KHz",
+        C: "118.0-136.975MHz",
+        D: "90-110KHz"
+    },
+    answer: "B",
+    explanation: "手冊第十四章-導航（P381）：NDB台通常運行在200到415KHz這個低中頻段，ADF接收機調諧到該頻段實現導航。"
+},
+{
+    id: 223,
+    question: "GPS系統的三大組成部分不包括？",
+    options: {
+        A: "太空部分（衛星）",
+        B: "控制部分（地面站）",
+        C: "使用者部分（接收機）",
+        D: "地面發射台部分"
+    },
+    answer: "D",
+    explanation: "手冊第十四章-導航（P386）：GPS系統由太空部分（衛星）、控制部分（地面站）、使用者部分（接收機）組成，無地面發射台部分。"
+},
+{
+    id: 224,
+    question: "LORAN-C導航系統的運行頻率範圍是？",
+    options: {
+        A: "90-110KHz",
+        B: "108.0-117.95MHz",
+        C: "200-415KHz",
+        D: "118.0-136.975MHz"
+    },
+    answer: "A",
+    explanation: "手冊第十四章-導航（P384）：LORAN-C運行在90-110KHz頻率範圍，基於對射頻能量脈衝的到達時間差的測量。"
+},
+{
+    id: 225,
+    question: "暖鋒通過時，通常不會出現的天氣現象是？",
+    options: {
+        A: "低層雲（層雲、層積雲）",
+        B: "輕到中度降水",
+        C: "突然的強陣風",
+        D: "能見度變差"
+    },
+    answer: "C",
+    explanation: "手冊第十章-天氣理論（P291）：暖鋒移動緩慢，會出現層狀雲、輕到中度降水、能見度變差；突然的強陣風是冷鋒的典型天氣。"
+},
+{
+    id: 226,
+    question: "天氣圖上，等壓線間隔越密表示？",
+    options: {
+        A: "氣壓梯度越陡，風速越大",
+        B: "氣壓梯度越緩，風速越小",
+        C: "溫度變化越大",
+        D: "降水概率越高"
+    },
+    answer: "A",
+    explanation: "手冊第十章-天氣理論（P280）：等壓線類似地形圖的等高線，間隔很近的等壓線表示急劇升降的風梯度和強風的盛行；間隔較遠表示微風。"
+},
+{
+    id: 227,
+    question: "受管制機場的核心特徵是？",
+    options: {
+        A: "有永久停機坪",
+        B: "有工作的控制塔臺",
+        C: "跑道長度超過2000米",
+        D: "僅用於商業航空運行"
+    },
+    answer: "B",
+    explanation: "手冊第十二章-機場的運行（P322）：受管制機場有一個工作的控制塔，ATC負責提供空中交通服務，要求飛行員與ATC保持雙向無線電通信。"
+},
+{
+    id: 228,
+    question: "NOTAM-D屬於哪類航行通告？",
+    options: {
+        A: "本地性質的事項",
+        B: "遙遠地區的事項",
+        C: "規章性資訊（如臨時飛行限制）",
+        D: "機場關閉通知"
+    },
+    answer: "B",
+    explanation: "手冊第十二章-機場的運行（P323）：NOTAM分三類，NOTAM-D或遙遠的、NOTAM-L或本地的、FDC NOTAM；NOTAM-D附加在每小時天氣報告上。"
+},
+{
+    id: 229,
+    question: "VFR飛行計畫的備案不要求提供的資訊是？",
+    options: {
+        A: "飛機類型和特殊裝備",
+        B: "申請的出發時間（UTC）",
+        C: "乘客身份資訊",
+        D: "巡航高度和飛行路線"
+    },
+    answer: "C",
+    explanation: "手冊第十四章-導航（P372）：VFR飛行計畫備案需提供飛機類型、出發時間、巡航高度、飛行路線等，不需要乘客身份資訊。"
+},
+{
+    id: 230,
+    question: "飛行中迷航時，首要採取的措施是？",
+    options: {
+        A: "立即下降高度尋找地標",
+        B: "爬升以增加無線電接收範圍",
+        C: "開啟應急頻率121.5MHz並持續廣播",
+        D: "關閉非必要設備節省燃油"
+    },
+    answer: "B",
+    explanation: "手冊第十四章-導航（P387）：迷航時若看不到城鎮，首要事情是爬升，留心空中交通和天氣，高度增加會擴大無線電接收和雷達覆蓋範圍。"
+},
+{
+    id: 231,
+    question: "航空決策制定（ADM）的核心是？",
+    options: {
+        A: "快速做出決定",
+        B: "風險管理和合理判斷",
+        C: "嚴格遵守操作程式",
+        D: "依賴儀錶數據"
+    },
+    answer: "B",
+    explanation: "手冊第十六章-航空決策制定（ADM）（P389）：ADM包含決策制定流程、風險管理、影響決策的因素等，核心是風險管理和合理判斷。"
+},
+{
+    id: 232,
+    question: "人體在18000英尺高度未使用氧氣時，可能出現的症狀是？",
+    options: {
+        A: "視力增強",
+        B: "反應速度下降",
+        C: "血壓降低",
+        D: "呼吸頻率減慢"
+    },
+    answer: "B",
+    explanation: "手冊第十章-天氣理論（P267）：在18000英尺，氧氣的分壓嚴重降低，對正常活動和人體功能產生不利影響，反應開始變差。"
+},
+{
+    id: 233,
+    question: "高度計設定窗（Kollsman窗）用於調整什麼參數？",
+    options: {
+        A: "溫度補償係數",
+        B: "海平面氣壓",
+        C: "高度單位（英尺/米）",
+        D: "儀錶靈敏度"
+    },
+    answer: "B",
+    explanation: "手冊第六章-飛行儀錶（P160）：高度計的Kollsman窗（大氣壓力設定窗）用於調整海平面氣壓設定，補償非標準大氣壓力，確保高度指示準確。"
+},
+{
+    id: 234,
+    question: "風三角形的三個組成要素不包括？",
+    options: {
+        A: "空速和航向",
+        B: "風向和風速",
+        C: "地面速度和航跡",
+        D: "燃油消耗速度"
+    },
+    answer: "D",
+    explanation: "手冊第十四章-導航（P363）：風三角形是風對飛行影響的圖形化解釋，包含空速和航向、風向和風速、地面速度和航跡三要素，與燃油消耗速度無關。"
+},
+{
+    id: 235,
+    question: "航位推測法（dead reckoning）的核心是通過什麼計算導航？",
+    options: {
+        A: "地標識別",
+        B: "時間、速度、距離和方向",
+        C: "無線電信號",
+        D: "衛星定位數據"
+    },
+    answer: "B",
+    explanation: "手冊第十四章-導航（P362）：航位推測法是只通過時間、速度、距離和方向的計算手段進行導航，經風速和風向調整後得到航向和地面速度。"
+},
+{
+    id: 236,
+    question: "RNAV（區域導航）的主要優點是？",
+    options: {
+        A: "只能沿固定航路飛行",
+        B: "可在任意兩點間直線飛行",
+        C: "僅依賴VOR信號",
+        D: "不需要航路點規劃"
+    },
+    answer: "B",
+    explanation: "手冊第十四章-導航（P379）：RNAV允許在飛行員確立的點之間的任何直接航路上進行電子航向引導，實現幾乎任何出發點和目的地之間的徑直航線飛行。"
+},
+{
+    id: 237,
+    question: "PAPI（緊密進近下滑道指示燈）的燈光數量是？",
+    options: {
+        A: "2個",
+        B: "4個",
+        C: "6個",
+        D: "8個"
+    },
+    answer: "B",
+    explanation: "手冊第十二章-機場的運行（P328）：PAPI使用類似VASI的燈光，以單排4個燈安裝，通常在跑道左側，通過燈光顏色組合指示下滑道位置。"
+},
+{
+    id: 238,
+    question: "低空風切變最易發生的高度範圍是？",
+    options: {
+        A: "地面到1000英尺AGL",
+        B: "1000-5000英尺AGL",
+        C: "5000-10000英尺AGL",
+        D: "10000英尺AGL以上"
+    },
+    answer: "A",
+    explanation: "手冊第十章-天氣理論（P278）：雖然風切變可以發生在任何高度，但由於飛機接近地面，低空（地面到1000英尺AGL）的風切變特別危險。"
+},
+{
+    id: 239,
+    question: "積雨雲（CB）伴隨的危險天氣不包括？",
+    options: {
+        A: "雷電",
+        B: "冰雹",
+        C: "平穩氣流",
+        D: "強陣風"
+    },
+    answer: "C",
+    explanation: "手冊第十章-天氣理論（P287）：積雨雲包含大量水汽和不穩定空氣，常產生閃電、冰雹、龍捲風、強陣風、紊流等危險天氣，無平穩氣流。"
+},
+{
+    id: 240,
+    question: "TAF（終端機場預報）的更新頻率是？",
+    options: {
+        A: "每6小時",
+        B: "每12小時",
+        C: "每24小時",
+        D: "每4小時"
+    },
+    answer: "A",
+    explanation: "手冊第十一章-天氣報告與預報（P306）：TAF每天更新4次，時間分別為00:00Z、06:00Z、12:00Z、18:00Z，間隔6小時。"
+},
+{
+    id: 241,
+    question: "VOR信號的傳輸特性是？",
+    options: {
+        A: "沿地球彎曲傳播",
+        B: "視距傳輸",
+        C: "不受高度影響",
+        D: "可穿透厚雲層"
+    },
+    answer: "B",
+    explanation: "手冊第十四章-導航（P374）：VOR設備是VHF的，傳輸的信號受視距傳輸限制，射程直接隨接收設備的高度相應變化。"
+},
+{
+    id: 242,
+    question: "ADF的「相對方位角」是相對於什麼測量的？",
+    options: {
+        A: "真北向",
+        B: "磁北向",
+        C: "飛機頭",
+        D: "目的地"
+    },
+    answer: "C",
+    explanation: "手冊第十四章-導航（P382）：相對方位角是指標在刻度盤上指向的角度值，相對於飛機頭，從飛機頭開始順時針測量到從飛機到台所畫直線的角度。"
+},
+{
+    id: 243,
+    question: "GPS接收機確定三維方位（經度、緯度、高度）需要至少幾顆衛星？",
+    options: {
+        A: "2顆",
+        B: "3顆",
+        C: "4顆",
+        D: "5顆"
+    },
+    answer: "C",
+    explanation: "手冊第十四章-導航（P386）：GPS接收機為解析自己的位置，要利用至少4個良好定位的衛星信號來得出三維方位（經度、緯度和高度），二維方位需要3顆。"
+},
+{
+    id: 244,
+    question: "天氣描述圖中，IFR區域用什麼標示？",
+    options: {
+        A: "實線輪廓的陰影區域",
+        B: "實線輪廓的非陰影區域",
+        C: "無輪廓區域",
+        D: "虛線輪廓的陰影區域"
+    },
+    answer: "A",
+    explanation: "手冊第十一章-天氣報告與預報（P316）：天氣描述圖中，IFR條件（雲幕高度小於1000英尺，能見度小於3英里）的地區用實線輪廓的陰影區域表示。"
+},
+{
+    id: 245,
+    question: "受管制機場的機場燈光由誰控制？",
+    options: {
+        A: "飛行員手動控制",
+        B: "空中交通管制員",
+        C: "自動定時器",
+        D: "機場管理員"
+    },
+    answer: "B",
+    explanation: "手冊第十二章-機場的運行（P330）：在受管制機場，機場燈光是由空中交通管制員控制的，飛行員可請求調整燈光強度。"
+},
+{
+    id: 246,
+    question: "在C類空域運行，飛機需具備的裝備是？",
+    options: {
+        A: "僅雙向無線電",
+        B: "雙向無線電和應答器（帶高度報告功能）",
+        C: "GPS接收機",
+        D: "雷達應答器（Mode S）"
+    },
+    answer: "B",
+    explanation: "手冊第十三章-空域（P343）：C類空域運行要求具備雙向無線電通信能力，裝備雙向無線電和帶高度報告功能的應答器。"
+},
+{
+    id: 247,
+    question: "地標領航（pilotage）的核心是參照什麼導航？",
+    options: {
+        A: "無線電信號",
+        B: "衛星定位",
+        C: "地面地標或檢查點",
+        D: "風向指示器"
+    },
+    answer: "C",
+    explanation: "手冊第十四章-導航（P362）：地標領航是以地標（landmark）或者檢查點為參照的導航方法，選擇有顯著特徵的地標（如公路、江河、機場）作為導航依據。"
+},
+{
+    id: 248,
+    question: "北半球的寇里奧利力（地球自轉偏向力）會使氣流向哪個方向偏轉？",
+    options: {
+        A: "向左",
+        B: "向右",
+        C: "向上",
+        D: "向下"
+    },
+    answer: "B",
+    explanation: "手冊第十章-天氣理論（P272）：地球自轉產生的寇里奧利力在北半球使得空氣向右偏轉，導致氣流沿彎曲的路線前進，偏轉程度在極地最大，赤道為零。"
+},
+{
+    id: 249,
+    question: "航空醫學中，人體開始出現缺氧反應的常見高度是？",
+    options: {
+        A: "5000英尺以上",
+        B: "10000英尺以上",
+        C: "15000英尺以上",
+        D: "18000英尺以上"
+    },
+    answer: "B",
+    explanation: "手冊第十章-天氣理論（P267）：在10000英尺以上一般人的反應開始變差，而對一些人則低到5000英尺，缺氧的生理反應從輕度定位障礙到完全不能定位。"
+},
+{
+    id: 250,
+    question: "ADM（航空決策制定）中，風險管理的關鍵步驟是？",
+    options: {
+        A: "忽略小風險",
+        B: "識別、評估和控制風險",
+        C: "優先考慮飛行效率",
+        D: "依賴經驗判斷"
+    },
+    answer: "B",
+    explanation: "手冊第十六章-航空決策制定（ADM）（P389）：ADM的風險管理核心步驟是識別潛在風險、評估風險嚴重程度、採取措施控制風險，確保飛行安全。"
+},
+// 第251-300題题库（接續之前的questionBank數組）
+{
+    id: 251,
+    question: "雙發運輸類飛機起飛第二階段的最低爬升斜率要求是？",
+    options: {
+        A: "2.4%",
+        B: "2.7%",
+        C: "3.0%",
+        D: "1.2%"
+    },
+    answer: "A",
+    explanation: "手冊第九章-飛機性能（P.261）：第二階段爬升要求，雙發飛機為2.4%，三發飛機2.7%，四發飛機3.0%。"
+},
+{
+    id: 252,
+    question: "對流層內的標準溫度遞減率是每升高1000英尺下降多少？",
+    options: {
+        A: "1攝氏度",
+        B: "2攝氏度",
+        C: "3攝氏度",
+        D: "5攝氏度"
+    },
+    answer: "B",
+    explanation: "手冊第十章-天氣理論（P.266）：對流層內，溫度以高度每升高1000英尺2攝氏度的比率下降。"
+},
+{
+    id: 253,
+    question: "航空例行天氣報告（METAR）的時間格式中，「161753Z」表示的含義是？",
+    options: {
+        A: "本地時間16日17時53分",
+        B: "世界協調時16日17時53分",
+        C: "本地時間17日16時53分",
+        D: "世界協調時17日16時53分"
+    },
+    answer: "B",
+    explanation: "手冊第十一章-天氣報告與預報（P.300）：METAR時間以6位數字表示，前兩位為日期，後四位為時間，尾字母Z表示世界協調時（UTC）。"
+},
+{
+    id: 254,
+    question: "平行跑道的識別字母不包括下列哪一個？",
+    options: {
+        A: "L（左）",
+        B: "C（中）",
+        C: "R（右）",
+        D: "M（主）"
+    },
+    answer: "D",
+    explanation: "手冊第十二章-機場運行（P.324）：平行跑道通過在編號後加L（左）、C（中）、R（右）區分，無M（主）字母標識。"
+},
+{
+    id: 255,
+    question: "A類空域的高度範圍是？",
+    options: {
+        A: "地面至10000英尺MSL",
+        B: "18000英尺MSL至60000英尺MSL",
+        C: "5000英尺AGL至18000英尺MSL",
+        D: "60000英尺MSL以上"
+    },
+    answer: "B",
+    explanation: "手冊第十三章-空域（P.341）：A類空域一般從18000英尺平均海平面高度到包括60000英尺高度層在內的範圍。"
+},
+{
+    id: 256,
+    question: "甚高頻全向信標（VOR）的運行頻率範圍是？",
+    options: {
+        A: "200-415KHz",
+        B: "108.0-117.95MHz",
+        C: "118.0-136.975MHz",
+        D: "90-110KHz"
+    },
+    answer: "B",
+    explanation: "手冊第十四章-導航（P.374）：VOR地面台在VHF頻段108.0-117.95MHz內發射信號。"
+},
+{
+    id: 257,
+    question: "低空風切變中「微爆」的典型特徵不包括？",
+    options: {
+        A: "水平範圍小於1英里",
+        B: "垂直範圍約1000英尺",
+        C: "向下氣流速度高達6000英尺/分鐘",
+        D: "持續時間超過1小時"
+    },
+    answer: "D",
+    explanation: "手冊第十章-天氣理論（P.279）：微爆典型發生在水平1英里、垂直1000英尺空間內，維持時間約15分鐘，向下氣流速度高達6000英尺/分鐘。"
+},
+{
+    id: 258,
+    question: "目視進近坡度指示燈（VASI）的兩排系統，標準下滑道角度通常為？",
+    options: {
+        A: "2度",
+        B: "3度",
+        C: "4度",
+        D: "5度"
+    },
+    answer: "B",
+    explanation: "手冊第十二章-機場運行（P.327）：兩排VASI裝置提供的目視下滑道斜度通常設定為3度。"
+},
+{
+    id: 259,
+    question: "G類空域的定義是？",
+    options: {
+        A: "有控制塔的機場周圍空域",
+        B: "未指定為A、B、C、D、E類的空域",
+        C: "18000英尺以上的高空空域",
+        D: "僅用於軍事訓練的空域"
+    },
+    answer: "B",
+    explanation: "手冊第十三章-空域（P.342）：G類空域是未指定為A、B、C、D、E類空域的部分，屬於非管制空域。"
+},
+{
+    id: 260,
+    question: "磁偏角為「東7度」時，真航向轉換為磁航向的規則是？",
+    options: {
+        A: "真航向加7度",
+        B: "真航向減7度",
+        C: "真航向加180度",
+        D: "真航向不變"
+    },
+    answer: "B",
+    explanation: "手冊第十四章-導航（P.354）：磁偏角修正規則為「東減西加」，東磁偏角需從真航向中減去，西磁偏角則加上。"
+},
+// 模組二：天氣報告與預報（261-270題）
+{
+    id: 261,
+    question: "終端機場預報（TAF）的有效期通常是？",
+    options: {
+        A: "12小時",
+        B: "24小時",
+        C: "36小時",
+        D: "48小時"
+    },
+    answer: "B",
+    explanation: "手冊第十一章-天氣報告與預報（P.306）：每一份TAF報告有效期只有24小時，每天更新4次。"
+},
+{
+    id: 262,
+    question: "雷暴成熟階段的主要特徵是？",
+    options: {
+        A: "僅有上升氣流，無降水",
+        B: "上升氣流與下降氣流並存，伴有強降水",
+        C: "僅有下降氣流，降水減弱",
+        D: "氣流平穩，無明顯升降"
+    },
+    answer: "B",
+    explanation: "手冊第十章-天氣理論（P.287）：雷暴成熟階段是最猛烈的階段，上升氣流與攜帶降水的下降氣流並存，伴有紊流、閃電等現象。"
+},
+{
+    id: 263,
+    question: "受管制機場的核心標誌是？",
+    options: {
+        A: "有跑道燈光系統",
+        B: "有工作的控制塔",
+        C: "跑道長度超過2000英尺",
+        D: "位於城市郊區"
+    },
+    answer: "B",
+    explanation: "手冊第十二章-機場運行（P.321）：受管制機場有一個工作的控制塔，ATC負責提供空中交通服務。"
+},
+{
+    id: 264,
+    question: "全球定位系統（GPS）的太空部分由多少顆衛星組成？",
+    options: {
+        A: "18顆",
+        B: "24顆",
+        C: "26顆",
+        D: "30顆"
+    },
+    answer: "C",
+    explanation: "手冊第十四章-導航（P.386）：GPS太空部分由一群26個繞地球運行的衛星組成，稱為GPS星群。"
+},
+{
+    id: 265,
+    question: "風切變的定義是？",
+    options: {
+        A: "同一高度風速均勻變化",
+        B: "小區域內風速和/或方向的突然劇烈變化",
+        C: "僅在雷暴中出現的強風",
+        D: "地面風速超過30節的強風"
+    },
+    answer: "B",
+    explanation: "手冊第十章-天氣理論（P.278）：風切變是指在一個非常小的區域內風速和/或方向的突然、激烈的變化。"
+},
+{
+    id: 266,
+    question: "B類空域內VFR飛行的最低能見度要求是？",
+    options: {
+        A: "1法定英里",
+        B: "2法定英里",
+        C: "3法定英里",
+        D: "5法定英里"
+    },
+    answer: "C",
+    explanation: "手冊第十三章-空域（P.340）：B類空域的VFR天氣最低標準為能見度3法定英里，遠離雲層。"
+},
+{
+    id: 267,
+    question: "自動定向儀（ADF）接收的無方向無線電信標（NDB）頻率範圍是？",
+    options: {
+        A: "200-415KHz",
+        B: "108.0-117.95MHz",
+        C: "118.0-136.975MHz",
+        D: "90-110KHz"
+    },
+    answer: "A",
+    explanation: "手冊第十四章-導航（P.381）：NDB台通常運行在200到415KHz這個低中頻段。"
+},
+{
+    id: 268,
+    question: "陸地民用機場的燈塔燈光組合是？",
+    options: {
+        A: "閃爍的白色和綠色",
+        B: "閃爍的白色和黃色",
+        C: "閃爍的白色、黃色和綠色",
+        D: "兩個快速白色閃爍接一個綠色閃爍"
+    },
+    answer: "A",
+    explanation: "手冊第十二章-機場運行（P.326）：閃爍的白色和綠色燈光表示陸地民用機場。"
+},
+{
+    id: 269,
+    question: "C類空域的垂直範圍通常是？",
+    options: {
+        A: "地面至2500英尺AGL",
+        B: "地面至4000英尺AGL",
+        C: "1200英尺AGL至10000英尺MSL",
+        D: "18000英尺MSL至60000英尺MSL"
+    },
+    answer: "B",
+    explanation: "手冊第十三章-空域（P.342）：C類空域一般從地面延伸到機場高度之上4000英尺AGL。"
+},
+{
+    id: 270,
+    question: "地面天氣圖上的「等壓線」表示的是？",
+    options: {
+        A: "相同溫度的區域",
+        B: "相同風向的區域",
+        C: "相同氣壓的區域",
+        D: "相同能見度的區域"
+    },
+    answer: "C",
+    explanation: "手冊第十一章-天氣報告與預報（P.280）：等壓線是畫在天氣圖上用於表示相同壓力區域的線條。"
+},
+// 模組三：機場運行與空域（271-280題）
+{
+    id: 271,
+    question: "確定運輸類飛機最大起飛重量時，不需要考慮的因素是？",
+    options: {
+        A: "機場壓力高度",
+        B: "跑道坡度",
+        C: "機場所屬國家",
+        D: "航跡障礙物"
+    },
+    answer: "C",
+    explanation: "手冊第九章-飛機性能（P.262）：確定最大起飛重量需考慮機場壓力高度、溫度、迎風分量、跑道長度、跑道坡度、航跡障礙物，與機場所屬國家無關。"
+},
+{
+    id: 272,
+    question: "METAR報告中「AUTO」修正符的含義是？",
+    options: {
+        A: "報告存在錯誤，已修正",
+        B: "報告來自自動化觀測站",
+        C: "天氣狀況正在快速變化",
+        D: "報告僅適用於自動駕駛飛行"
+    },
+    answer: "B",
+    explanation: "手冊第十一章-天氣報告與預報（P.300）：METAR中「AUTO」符號表示報告來自一個自動化的來源。"
+},
+{
+    id: 273,
+    question: "雷暴的生命周期不包括下列哪個階段？",
+    options: {
+        A: "積雲階段",
+        B: "成熟階段",
+        C: "擴散階段",
+        D: "消散階段"
+    },
+    answer: "C",
+    explanation: "手冊第十章-天氣理論（P.287）：雷暴的發展會經歷積雲階段、成熟階段、消散階段三個明顯階段，無擴散階段。"
+},
+{
+    id: 274,
+    question: "非管制機場推薦的通信頻率不包括？",
+    options: {
+        A: "CTAF頻率",
+        B: "UNICOM頻率",
+        C: "MULTICOM頻率（122.9MHz）",
+        D: "塔臺管制頻率"
+    },
+    answer: "D",
+    explanation: "手冊第十二章-機場運行（P.322）：非管制機場無工作控制塔，推薦使用CTAF、UNICOM或MULTICOM頻率通報意圖，無塔臺管制頻率。"
+},
+{
+    id: 275,
+    question: "VOR接收機的精度檢查中，地面檢查的容許偏差為？",
+    options: {
+        A: "±2度",
+        B: "±4度",
+        C: "±6度",
+        D: "±8度"
+    },
+    answer: "B",
+    explanation: "手冊第十四章-導航（P.375）：VOR精度檢查的IFR容許偏差為地面檢查±4度，空中檢查±6度，VFR飛行可參照此標準。"
+},
+{
+    id: 276,
+    question: "風三角形的三個核心要素是？",
+    options: {
+        A: "空速、風速、地速",
+        B: "航向、航跡、偏航角",
+        C: "真航向、磁航向、羅盤航向",
+        D: "高度、溫度、氣壓"
+    },
+    answer: "A",
+    explanation: "手冊第十四章-導航（P.363）：風三角形是風對飛行影響的圖形化解釋，核心要素包括飛機空速、環境風速、飛機相對地面的地速。"
+},
+{
+    id: 277,
+    question: "終端機場預報（TAF）每天更新的次數是？",
+    options: {
+        A: "2次",
+        B: "4次",
+        C: "6次",
+        D: "8次"
+    },
+    answer: "B",
+    explanation: "手冊第十一章-天氣報告與預報（P.306）：TAF每天更新4次，時間分別為00:00Z、06:00Z、12:00Z、18:00Z。"
+},
+{
+    id: 278,
+    question: "機場滑行道的中心線標記顏色是？",
+    options: {
+        A: "白色",
+        B: "黃色",
+        C: "紅色",
+        D: "藍色"
+    },
+    answer: "B",
+    explanation: "手冊第十二章-機場運行（P.324）：連續的黃色中心線用來識別滑行道。"
+},
+{
+    id: 279,
+    question: "D類空域的垂直範圍通常是？",
+    options: {
+        A: "地面至2500英尺AGL",
+        B: "地面至4000英尺AGL",
+        C: "1200英尺AGL至10000英尺MSL",
+        D: "18000英尺MSL至60000英尺MSL"
+    },
+    answer: "A",
+    explanation: "手冊第十三章-空域（P.342）：D類空域一般從地面延伸到機場高度之上的2500英尺AGL。"
+},
+{
+    id: 280,
+    question: "下列哪種霧是由暖濕空氣移動到寒冷地面上形成的？",
+    options: {
+        A: "輻射霧",
+        B: "平流霧",
+        C: "滑升霧",
+        D: "蒸汽霧"
+    },
+    answer: "B",
+    explanation: "手冊第十章-天氣理論（P.284）：平流霧是當一層溫暖潮濕的空氣在寒冷地面上移動時形成的，需要15節以下風速。"
+},
+// 模組四：導航與飛行計畫（281-290題）
+{
+    id: 281,
+    question: "飛機燃油消耗的計算公式是？",
+    options: {
+        A: "燃油消耗=飛行時間×燃油消耗率（加侖/小時）",
+        B: "燃油消耗=飛行距離×燃油消耗率（加侖/海裡）",
+        C: "燃油消耗=地面速度×燃油消耗率（加侖/節）",
+        D: "燃油消耗=空速×燃油消耗率（加侖/節）"
+    },
+    answer: "A",
+    explanation: "手冊第十四章-導航（P.360）：燃油消耗用加侖每小時計算，總消耗量=飛行時間×燃油消耗速度（加侖/小時）。"
+},
+{
+    id: 282,
+    question: "重要氣象資訊（SIGMET）的標準有效期是？",
+    options: {
+        A: "2小時",
+        B: "4小時",
+        C: "6小時",
+        D: "12小時"
+    },
+    answer: "B",
+    explanation: "手冊第十一章-天氣報告與預報（P.311）：SIGMET是不定期預報，有效時間為4小時，與颶風有關時為6小時。"
+},
+{
+    id: 283,
+    question: "機場跑道編號的依據是？",
+    options: {
+        A: "跑道長度",
+        B: "磁北向為基準的方向",
+        C: "真北向為基準的方向",
+        D: "機場所在經度"
+    },
+    answer: "B",
+    explanation: "手冊第十二章-機場運行（P.324）：跑道編號以磁北向為基準，取跑道方向與磁北向夾角的十位數和百位數。"
+},
+{
+    id: 284,
+    question: "VOR信號的傳輸特性是？",
+    options: {
+        A: "沿地球彎曲傳播，不受高度影響",
+        B: "視距傳輸，受接收設備高度影響",
+        C: "僅在對流層內傳播",
+        D: "會被降水完全阻擋"
+    },
+    answer: "B",
+    explanation: "手冊第十四章-導航（P.374）：VOR設備是VHF的，傳輸的信號受視距傳輸限制，接收距離直接隨接收設備的高度而變化。"
+},
+{
+    id: 285,
+    question: "北半球的科里奧利力會使運動的空氣向哪個方向偏轉？",
+    options: {
+        A: "向左偏轉",
+        B: "向右偏轉",
+        C: "向上偏轉",
+        D: "向下偏轉"
+    },
+    answer: "B",
+    explanation: "手冊第十章-天氣理論（P.273）：地球自轉產生的科里奧利力在北半球使得空氣向右偏轉，導致氣流沿彎曲路線前進。"
+},
+{
+    id: 286,
+    question: "VFR飛行計畫的備案方式不包括？",
+    options: {
+        A: "通過FSS電話備案",
+        B: "起飛後通過無線電備案",
+        C: "通過互聯網備案",
+        D: "通過機場保安備案"
+    },
+    answer: "D",
+    explanation: "手冊第十四章-導航（P.372）：VFR飛行計畫可通過FSS電話、起飛後無線電備案，也可通過DUATS等網絡服務備案，無需通過機場保安備案。"
+},
+{
+    id: 287,
+    question: "積雨雲（CB）的主要危險天氣現象不包括？",
+    options: {
+        A: "強紊流",
+        B: "冰雹",
+        C: "平穩氣流",
+        D: "雷電"
+    },
+    answer: "C",
+    explanation: "手冊第十章-天氣理論（P.287）：積雨雲包含大量水汽和不穩定空氣，常產生強紊流、冰雹、雷電、強陣風等危險天氣，無平穩氣流。"
+},
+{
+    id: 288,
+    question: "B類空域的垂直範圍通常是？",
+    options: {
+        A: "地面至10000英尺MSL",
+        B: "地面至4000英尺AGL",
+        C: "1200英尺AGL至10000英尺MSL",
+        D: "18000英尺MSL至60000英尺MSL"
+    },
+    answer: "A",
+    explanation: "手冊第十三章-空域（P.341）：B類空域通常是全國最繁忙的機場周圍從地面到10000英尺平均海平面高度的空域。"
+},
+{
+    id: 289,
+    question: "自動定向儀（ADF）的「相對方位角」是指？",
+    options: {
+        A: "從真北向順時針測量到導航台的角度",
+        B: "從磁北向順時針測量到導航台的角度",
+        C: "從飛機頭順時針測量到導航台的角度",
+        D: "從飛機尾順時針測量到導航台的角度"
+    },
+    answer: "C",
+    explanation: "手冊第十四章-導航（P.382）：相對方位角是從飛機頭開始順時針測量到從飛機到台所畫直線的角度，相對於飛機頭。"
+},
+{
+    id: 290,
+    question: "飛行員天氣報告（PIREPs）的主要作用是？",
+    options: {
+        A: "提供機場的氣壓設定",
+        B: "報告飛行中遇到的天氣狀況（如紊流、結冰）",
+        C: "預報未來24小時的天氣",
+        D: "發布跑道關閉資訊"
+    },
+    answer: "B",
+    explanation: "手冊第十一章-天氣報告與預報（P.302）：PIREPs提供了飛行時有關狀況的重要資訊，包括雲底/雲頂高度、風切變、紊流、結冰等，無法從其他來源收集。"
+},
+// 模組五：航空決策與醫學（291-300題）
+{
+    id: 291,
+    question: "著陸時VREF速度的定義是？",
+    options: {
+        A: "著陸設定時失速速度的1.3倍",
+        B: "著陸設定時失速速度的1.5倍",
+        C: "進近時的最大允許速度",
+        D: "著陸滑跑的最大速度"
+    },
+    answer: "A",
+    explanation: "手冊第九章-飛機性能（P.262）：VREF是著陸設定時失速速度的1.3倍，在跑道盡頭50英尺高度要求這個速度。"
+},
+{
+    id: 292,
+    question: "METAR報告中能見度的單位是？",
+    options: {
+        A: "海裡",
+        B: "法定英里（SM）",
+        C: "公里",
+        D: "英尺"
+    },
+    answer: "B",
+    explanation: "手冊第十一章-天氣報告與預報（P.301）：METAR中主要能見度以法定英里（SM）報告，用英里數和英里的分數表示。"
+},
+{
+    id: 293,
+    question: "機場的風向指示器不包括下列哪種？",
+    options: {
+        A: "風向袋",
+        B: "丁字風向標",
+        C: "四面體",
+        D: "跑道燈塔"
+    },
+    answer: "D",
+    explanation: "手冊第十二章-機場運行（P.331）：風向指示器包括風向袋、丁字風向標、四面體，跑道燈塔用於識別機場，不屬於風向指示器。"
+},
+{
+    id: 294,
+    question: "VOR的三種類型不包括？",
+    options: {
+        A: "VOR",
+        B: "VOR/DME",
+        C: "VORTAC",
+        D: "VOR/ADF"
+    },
+    answer: "D",
+    explanation: "手冊第十四章-導航（P.373）：VOR系統表現為三種導航設施：VOR、VOR/DME、VORTAC，無VOR/ADF類型。"
+},
+{
+    id: 295,
+    question: "低空風切變警報系統（LLWAS）的作用是？",
+    options: {
+        A: "預報未來24小時的風切變",
+        B: "檢測機場周圍風向變化，超15節時發出警報",
+        C: "自動調整飛機航向規避风切變",
+        D: "僅在雷暴來臨時啟動"
+    },
+    answer: "B",
+    explanation: "手冊第十章-天氣理論（P.279）：LLWAS由機場周圍的風速計組成網路，檢測風向變化，當風速變化超過15節時，向飛行員報告風切變警告。"
+},
+{
+    id: 296,
+    question: "飛行計畫關閉的正確方式是？",
+    options: {
+        A: "起飛後自動關閉",
+        B: "到達目的地後聯繫最近的FSS關閉",
+        C: "無需關閉，有效期結束後自動失效",
+        D: "通過塔臺管制員關閉"
+    },
+    answer: "B",
+    explanation: "手冊第十四章-導航（P.372）：到達目的地後，應聯繫最近的飛行服務站（FSS）關閉飛行計畫，避免無線電通信擁擠。"
+},
+{
+    id: 297,
+    question: "雷暴消散階段的主要特徵是？",
+    options: {
+        A: "上升氣流主導，無降水",
+        B: "下降氣流主導，降水減弱",
+        C: "上升與下降氣流並存，降水最強",
+        D: "氣流平穩，雲頂逐漸升高"
+    },
+    answer: "B",
+    explanation: "手冊第十章-天氣理論（P.287）：雷暴消散階段，下降的氣流分散開來取代了維持暴風雨所需的上升氣流，降水逐漸減弱。"
+},
+{
+    id: 298,
+    question: "E類空域的定義是？",
+    options: {
+        A: "有控制塔的機場周圍空域",
+        B: "未指定為A、B、C、D類的受控空域",
+        C: "僅用於儀錶飛行的空域",
+        D: "地面至10000英尺MSL的空域"
+    },
+    answer: "B",
+    explanation: "手冊第十三章-空域（P.342）：E類空域一般是未指定為A、B、C、D類空域的受控空域，無確定垂直限制。"
+},
+{
+    id: 299,
+    question: "航位推測法（dead reckoning）的核心依據是？",
+    options: {
+        A: "地面地標識別",
+        B: "無線電導航設施信號",
+        C: "時間、速度、距離和方向的計算",
+        D: "衛星定位信號"
+    },
+    answer: "C",
+    explanation: "手冊第十四章-導航（P.362）：航位推測法是只通過根據時間、速度、距離和方向的計算手段的導航，經過風速和速度調整後確定航向和地面速度。"
+},
+{
+    id: 300,
+    question: "航空決策制定（ADM）的核心目的是？",
+    options: {
+        A: "提高飛行員的操作技能",
+        B: "幫助飛行員在飛行中做出安全有效的決策",
+        C: "簡化飛行計畫的制定流程",
+        D: "僅用於應對緊急情況"
+    },
+    answer: "B",
+    explanation: "手冊第十六章-航空決策制定（P.389）：ADM的目的是幫助飛行員學習天氣理論背景知識，培養和天氣有關的有效決斷技能，核心是在飛行中做出安全有效的決策。"
+}
+        ];
+
+        let currentIndex = 0;
+        let selectedOption = null;
+        let isAnswered = false;
+
+        // 初始化頁面
+        function initPage() {
+            loadQuestion(currentIndex);
+        }
+
+        // 加載題目
+        function loadQuestion(index) {
+            const question = questionBank[index];
+            document.getElementById("question-id").textContent = question.id;
+            document.getElementById("question-content").textContent = question.question;
+            document.getElementById("current-question").textContent = question.id;
+
+            // 加載選項
+            const options = document.querySelectorAll(".option");
+            options[0].textContent = `A. ${question.options.A}`;
+            options[1].textContent = `B. ${question.options.B}`;
+            options[2].textContent = `C. ${question.options.C}`;
+            options[3].textContent = `D. ${question.options.D}`;
+
+            // 重置狀態
+            resetOptionStatus();
+            document.getElementById("feedback").style.display = "none";
+            selectedOption = null;
+            isAnswered = false;
+
+            // 更新導航按鈕狀態
+            document.querySelector(".btn-nav:first-child").disabled = index === 0;
+        }
+
+        // 重置選項狀態
+        function resetOptionStatus() {
+            const options = document.querySelectorAll(".option");
+            options.forEach(option => {
+                option.classList.remove("selected", "correct", "incorrect");
+            });
+        }
+
+        // 選擇選項
+        function selectOption(element) {
+            if (isAnswered) return;
+            resetOptionStatus();
+            element.classList.add("selected");
+            selectedOption = element.getAttribute("data-option");
+        }
+
+        // 提交答案
+        function submitAnswer() {
+            if (!selectedOption) {
+                alert("請選擇一個選項！");
+                return;
+            }
+
+            const question = questionBank[currentIndex];
+            const isCorrect = selectedOption === question.answer;
+            isAnswered = true;
+
+            // 標記正確/錯誤選項
+            const options = document.querySelectorAll(".option");
+            options.forEach(option => {
+                if (option.getAttribute("data-option") === question.answer) {
+                    option.classList.add("correct");
+                } else if (option.getAttribute("data-option") === selectedOption && !isCorrect) {
+                    option.classList.add("incorrect");
+                }
+            });
+
+            // 顯示反饋
+            const feedback = document.getElementById("feedback");
+            const feedbackTitle = document.getElementById("feedback-title");
+            const feedbackContent = document.getElementById("feedback-content");
+            const explanationText = document.getElementById("explanation-text");
+
+            if (isCorrect) {
+                feedback.className = "feedback-area feedback-correct";
+                feedbackTitle.textContent = "答對了！真棒～";
+                feedbackContent.textContent = `正確答案：${question.answer} - ${question.options[question.answer]}`;
+            } else {
+                feedback.className = "feedback-area feedback-incorrect";
+                feedbackTitle.textContent = "答錯了，再試試～";
+                feedbackContent.textContent = `正確答案：${question.answer} - ${question.options[question.answer]}，你的選擇：${selectedOption} - ${question.options[selectedOption]}`;
+            }
+            explanationText.textContent = question.explanation;
+            feedback.style.display = "block";
+        }
+
+        // 上一題
+        function prevQuestion() {
+            if (currentIndex > 0) {
+                currentIndex--;
+                loadQuestion(currentIndex);
+            }
+        }
+
+        // 下一題
+// 原有函数：nextQuestion（复制时不用改原有代码，直接在后面粘贴）
+function nextQuestion() {
+  if (currentIndex < questionBank.length - 1) {
+    currentIndex++;
+    loadQuestion(currentIndex);
+  } else {
+    alert("已經是最後一題啦！");
+  }
+}
+
+// 👇 新增：跳转到特定题号函数（直接粘贴）
+function jumpToSpecificQuestion() {
+  const targetInput = document.getElementById("target-question");
+  const targetId = parseInt(targetInput.value.trim());
+  const totalQuestions = questionBank.length; // 自动适配题库总题数（300题）
+  
+  // 验证输入合法性
+  if (isNaN(targetId) || targetId < 1 || targetId > totalQuestions) {
+    alert(`请输入1-${totalQuestions}之间的有效题号！`);
+    targetInput.value = ""; // 清空无效输入
+    return;
+  }
+  
+  // 计算数组索引（题库数组从0开始，题号从1开始）
+  currentIndex = targetId - 1;
+  loadQuestion(currentIndex); // 加载目标题目
+  targetInput.value = ""; // 清空输入框
+}
+
+// 新增：跳转到随机题号函数（直接粘贴）
+function jumpToRandomQuestion() {
+  const totalQuestions = questionBank.length;
+  // 生成1-300之间的随机整数，转换为数组索引
+  currentIndex = Math.floor(Math.random() * totalQuestions);
+  loadQuestion(currentIndex); // 加载随机题目
+  
+  // 提示当前跳转的题号
+  alert(`已随机跳转到第${currentIndex + 1}题`);
+}
+// 👆 新增函数结束
+
+// 原有：页面加载初始化
+window.onload = initPage;
+        // 頁面加載完成後初始化
+        window.onload = initPage;
+    </script>
+</body>
+</html>
